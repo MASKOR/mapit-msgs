@@ -15,7 +15,45 @@ file(GLOB ProtoFiles ${PROJECT_SOURCE_DIR}/messages/*.proto)
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
+
+######## Protobuf + gRpc
+#protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
+
+foreach(FIL ${ProtoFiles})
+    message( "PROTO3 : " ${FIL} )
+    get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+    get_filename_component(FIL_WE ${FIL} NAME_WE)
+
+    list(APPEND MESSAGES_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.grpc.pb.cc")
+    list(APPEND MESSAGES_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.grpc.pb.h")
+
+    list(APPEND MESSAGES_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
+    list(APPEND MESSAGES_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.grpc.pb.cc"
+             "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.grpc.pb.h"
+        COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+        ARGS --grpc_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages --plugin=protoc-gen-grpc=/home/dbulla/develop/grpc/bins/opt/grpc_cpp_plugin ${ABS_FIL}
+        DEPENDS ${ABS_FIL}
+        COMMENT "Running grpc protocol buffer compiler on ${FIL}"
+        VERBATIM )
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
+               "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
+        COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+        ARGS --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
+        DEPENDS ${ABS_FIL}
+        COMMENT "Running C++ protocol buffer compiler on ${FIL}"
+        VERBATIM )
+endforeach()
+
+set_source_files_properties(${MESSAGES_SRCS} ${MESSAGES_HDRS} PROPERTIES GENERATED TRUE)
+#set(MESSAGES_SRCS ${MESSAGES_SRCS} PARENT_SCOPE)
+#set(MESSAGES_HDRS ${MESSAGES_HDRS} PARENT_SCOPE)
+
+########
 
 add_library(${PROJECT_NAME} ${MESSAGES_SRCS} ${MESSAGES_HDRS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
