@@ -1,18 +1,18 @@
 syntax = "proto3";
 
 message Map {
-  required string name = 1;
-  required int32 id = 2;
+  string name = 1;
+  int32 id = 2;
 
-           int64 lastChange = 3; // unix time
+  int64 lastChange = 3; // unix time
 
-  repeated Layer layers = 4;
+  Layer layers = 4;
 
   message Layer {
-    required string name = 1;
-    required int32 id = 2;
-    required LayerType type = 3 [default = POINTCLOUD2];
-             LayerUsageType usageType = 4 [default = LASER];
+    string name = 1;
+    int32 id = 2;
+    LayerType type = 3;
+    LayerUsageType usageType = 4;
 
     enum LayerType {
       POINTCLOUD2 = 0;
@@ -29,17 +29,17 @@ message Map {
 }
 
 message Region {
-  required int64 layerId = 1;
+  int64 layerId = 1;
 
-  required float minx = 2;
-  required float maxx = 3;
-  required float miny = 4;
-  required float maxy = 5;
-  required float minz = 6;
-  required float maxz = 7;
-  required int32 levelOfDetail = 8;
-           bool announce = 9;
-           ClipMode clipMode = 10;
+  float minx = 2;
+  float maxx = 3;
+  float miny = 4;
+  float maxy = 5;
+  float minz = 6;
+  float maxz = 7;
+  int32 levelOfDetail = 8;
+  bool announce = 9;
+  ClipMode clipMode = 10;
 
   enum ClipMode {
     EXACT = 0;
@@ -48,7 +48,7 @@ message Region {
 }
 
 message RegionData {
-  required int64 dataSize = 1;
+  int64 dataSize = 1;
   // Coded Stream if dataSize > 0
 }
 
