@@ -1,30 +1,33 @@
 syntax = "proto3";
+package upns;
 
 message Map {
   string name = 1;
-  int32 id = 2;
+  int64 id = 2;
 
   int64 lastChange = 3; // unix time
 
-  Layer layers = 4;
+  repeated Layer layers = 4;
 
-  message Layer {
-    string name = 1;
-    int32 id = 2;
-    LayerType type = 3;
-    LayerUsageType usageType = 4;
+}
 
-    enum LayerType {
-      POINTCLOUD2 = 0;
-      OCTOMAP = 1;
-      OPENVDB = 2;
-    }
-    enum LayerUsageType {
-      LASER = 0;
-      RADAR = 1;
-      NAVIGATION = 2;
-      ANNOTATION = 3;
-    }
+message Layer {
+  string name = 1;
+  int64 id = 2;
+  LayerType type = 3;
+  LayerUsageType usageType = 4;
+
+  enum LayerType {
+    POINTCLOUD2 = 0;
+    OCTOMAP = 1;
+    OPENVDB = 2;
+    LAST_PREDEFINED = 3;
+  }
+  enum LayerUsageType {
+    LASER = 0;
+    RADAR = 1;
+    NAVIGATION = 2;
+    ANNOTATION = 3;
   }
 }
 
