@@ -11,24 +11,25 @@ message Map {
 
 }
 
+enum LayerType {
+  POINTCLOUD2 = 0;
+  OCTOMAP = 1;
+  OPENVDB = 2;
+  LAST_PREDEFINED = 3;
+}
+enum LayerUsageType {
+  LASER = 0;
+  RADAR = 1;
+  NAVIGATION = 2;
+  ANNOTATION = 3;
+}
+
 message Layer {
   string name = 1;
   int64 id = 2;
   LayerType type = 3;
   LayerUsageType usageType = 4;
 
-  enum LayerType {
-    POINTCLOUD2 = 0;
-    OCTOMAP = 1;
-    OPENVDB = 2;
-    LAST_PREDEFINED = 3;
-  }
-  enum LayerUsageType {
-    LASER = 0;
-    RADAR = 1;
-    NAVIGATION = 2;
-    ANNOTATION = 3;
-  }
 }
 
 message Region {
