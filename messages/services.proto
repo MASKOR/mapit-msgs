@@ -1,6 +1,14 @@
 syntax = "proto3";
 package upns;
 
+/**
+ * \brief A map containing multiple layers, grouping them logically together.
+ *
+ * The layers of a map share the same coordinate system. If an operation on the map's layers results in a layer,
+ * which remains in the same coordinate system, a layer will be added to the originating map (for most operators \sa Operator ).
+ * If the layer is not in the same coordinate system, a new mayp will be created.
+ */
+
 message Map {
   string name = 1;
   int64 id = 2;
@@ -11,6 +19,11 @@ message Map {
 
 }
 
+/**
+ * \brief Type of binary layerdata saved
+ * For each type correspnding wrappers must exist which handle serialization of a layer using \sa LayerDataStreamProvider.
+ * Moreover spartial requests must be made possible by such a module \sa LayerData.
+ */
 enum LayerType {
   POINTCLOUD2 = 0;
   OCTOMAP = 1;
