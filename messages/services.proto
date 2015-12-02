@@ -28,7 +28,8 @@ enum LayerType {
   POINTCLOUD2 = 0;
   OCTOMAP = 1;
   OPENVDB = 2;
-  LAST_PREDEFINED = 3;
+  POSES = 3;
+  LAST_PREDEFINED = 4;
 }
 enum LayerUsageType {
   LASER = 0;
