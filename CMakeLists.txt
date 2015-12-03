@@ -65,7 +65,7 @@ set_source_files_properties(${MESSAGES_SRCS} ${MESSAGES_HDRS} PROPERTIES GENERAT
 ########
 include_directories(${UPNS_INTERFACE_INCLUDE})
 
-add_library(${PROJECT_NAME} ${MESSAGES_SRCS} ${MESSAGES_HDRS})
+add_library(${PROJECT_NAME} SHARED ${MESSAGES_SRCS} ${MESSAGES_HDRS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 
 # all projects depending on this will include PROTOBUF_OUTPUT_DIR
