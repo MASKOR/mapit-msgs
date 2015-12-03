@@ -43,7 +43,62 @@ message Layer {
   int64 id = 2;
   LayerType type = 3;
   LayerUsageType usageType = 4;
+  repeated Entity entities = 5;
+}
 
+message Entity {
+  int64 id = 1;
+  int64 lastChange = 2; // unix time
+  Transform tf = 3;
+}
+
+message Transform {
+  float m00 = 1; // scale x
+  float m01 = 2;
+  float m02 = 3;
+  float m03 = 4;
+  float m10 = 5;
+  float m11 = 6; // scale y
+  float m12 = 7;
+  float m13 = 8;
+  float m20 = 9;
+  float m21 = 10;
+  float m22 = 11;
+  float m23 = 12;
+  float m30 = 13; // x
+  float m31 = 14; // y
+  float m32 = 15; // z
+  float m33 = 16; // scale z
+  int64 id = 17;
+  int64 parentId = 18; // if parentId is 0, the transform is absolute and in the same coordinate system as the map's root transform
+  int64 timestamp = 19;
+  repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
+}
+
+message OperationDescription {
+    string operatorName = 1;
+    int32 operatorVersion = 2;
+    repeated OperationParameter params = 3;
+}
+
+message OperationParameter {
+    string                        key = 1;
+
+    //optional, set one of these
+    OperationParameterEntity      entityVal = 2;
+    OperationParameterTransform   transformVal = 3;
+    int64                         intVal = 4;
+    double                        realVal = 5;
+    string                        strVal = 6;
+}
+
+message OperationParameterEntity {
+    int64 mapId = 1;
+    int64 layerId = 2;
+    int64 entityId = 3;
+}
+message OperationParameterTransform {
+    int64 tfId = 1;
 }
 
 message Region {
