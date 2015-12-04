@@ -71,8 +71,21 @@ message Transform {
   float m33 = 16; // scale z
   int64 id = 17;
   int64 parentId = 18; // if parentId is 0, the transform is absolute and in the same coordinate system as the map's root transform
-  int64 timestamp = 19;
+  int64 timestamp = 19; // 32bit seconds and 32bit nanoseconds
   repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
+}
+
+message Commit {
+    string commitId = 1;
+    string parentCommitId = 2;
+    repeated OperationDescription ops = 3;
+    repeated ObjectVersion maps = 4;
+    repeated ObjectVersion entities = 5;
+}
+
+message ObjectVersion {
+    int64 id = 1;
+    string commitId = 2;
 }
 
 message OperationDescription {
