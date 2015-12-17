@@ -25,11 +25,12 @@ message Map {
  * Moreover spartial requests must be made possible by such a module \sa LayerData.
  */
 enum LayerType {
-  POINTCLOUD2 = 0;
-  OCTOMAP = 1;
-  OPENVDB = 2;
-  POSES = 3;
-  LAST_PREDEFINED = 4;
+  NONE = 0;
+  POINTCLOUD2 = 1;
+  OCTOMAP = 2;
+  OPENVDB = 3;
+  POSES = 4;
+  LAST_PREDEFINED = 5;
 }
 enum LayerUsageType {
   LASER = 0;
