@@ -2,6 +2,29 @@ syntax = "proto3";
 package upns;
 
 /**
+ * \brief A Tree like structure (commit: collection of maps, map: collection of layers, layer: collection of entities)
+ *
+ * A tree itself does not have a name. Each subelement of the tree does have a name.
+ * The id is the (sha) checksum of the referenced object (binary)
+ * The name is used to identify the object across versions.
+ *
+ * Versioning will be implemented in two steps:
+ * 1) Every object has a name (unique in the treeish) and id (globaly uniqe, two ids reference the same object).
+ *    Objects can be read and can be written to.
+ * 2) Objects can be read in the context of a commit OR a rolling commit (aka checkout).
+ *    When writing in the context of this commit, changes are indexed/appended to a protocol.
+ */
+message UpnsTreeish {
+    string id = 1;
+    repeated NamedReference ref = 2;
+}
+
+message NamedReference {
+    string name = 1;
+    string id = 2; // another treeish, map, layer or entity. TODO: Remove member "layers" from map and "entities" from layer.
+}
+
+/**
  * \brief A map containing multiple layers, grouping them logically together.
  *
  * The layers of a map share the same coordinate system. If an operation on the map's layers results in a layer,
@@ -16,7 +39,6 @@ message Map {
   int64 lastChange = 3; // unix time
 
   repeated Layer layers = 4;
-
 }
 
 /**
@@ -79,7 +101,7 @@ message Transform {
 message Commit {
     string commitId = 1;
     string parentCommitId = 2;
-    repeated OperationDescription ops = 3;
+    repeated OperationDescription ops = 3; // Also tracks renames via "update metadata" operator. Thus the history of a map can be restored, although the name changed.
     repeated ObjectVersion maps = 4;
     repeated ObjectVersion entities = 5;
 }
