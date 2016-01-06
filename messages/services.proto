@@ -9,18 +9,19 @@ package upns;
  * The name is used to identify the object across versions.
  *
  * Versioning will be implemented in two steps:
- * 1) Every object has a name (unique in the treeish) and id (globaly uniqe, two ids reference the same object).
+ * 1) Every object has a name (unique in the tree) and id (globaly uniqe, two ids reference the same object).
  *    Objects can be read and can be written to.
  * 2) Objects can be read in the context of a commit OR a rolling commit (aka checkout).
  *    When writing in the context of this commit, changes are indexed/appended to a protocol.
  */
-message Treeish {
+message Tree {
     string id = 1;
     map<string, ObjectReference> refs = 2;
 }
 
+// TODO: Entity may be ObjectReference
 message ObjectReference {
-    string id = 1; // another treeish, or entity. TODO: Remove member "layers" from map and "entities" from layer.
+    string id = 1; // another tree, or entity. TODO: Remove member "layers" from map and "entities" from layer.
     int64 lastChange = 2; // unix time
     string meta = 3;
 }
@@ -134,7 +135,7 @@ message Commit {
     }
     repeated ObjectIdList detailedTransitions = 5;
 
-    // Entrypoint to Treeish with children hierarchy: root-> maps -> layers -> entities
+    // Entrypoint to Tree with children hierarchy: root-> maps -> layers -> entities
     string root = 6;
 }
 
@@ -164,7 +165,7 @@ message OperationParameter {
     string                        strval = 4;
     int64                         transformval = 5;
 
-    string paramId = 6;
+    string objectId = 6;
 
     //... or set 1) map; 2) map and layer; 3) map, layer and entity
     int64      entityval = 7; //deprecated
