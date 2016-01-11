@@ -36,14 +36,14 @@ message ObjectReference {
  * If the layer is not in the same coordinate system, a new mayp will be created.
  */
 
-message Map {
-  string name = 1;
-  int64 id = 2;
+//message Map {
+//  string name = 1;
+//  int64 id = 2;
 
-  int64 lastChange = 3; // unix time
+//  int64 lastChange = 3; // unix time
 
-  repeated Layer layers = 4;
-}
+//  repeated Layer layers = 4;
+//}
 
 /**
  * \brief Type of binary layerdata saved
@@ -65,17 +65,17 @@ enum LayerUsageType {
   ANNOTATION = 3;
 }
 
-message Layer {
-  string name = 1;
-  int64 id = 2;
-  LayerType type = 3;
-  LayerUsageType usageType = 4;
-  repeated Entity entities = 5;
-}
+//message Layer {
+//  string name = 1;
+//  string id = 2;
+//  LayerType type = 3;
+//  LayerUsageType usageType = 4;
+//  repeated Entity entities = 5;
+//}
 
 message Entity {
-  int64 id = 1;
-  int64 dataId = 2; // Hash of the complete entity data stream
+  string id = 1;
+  string dataId = 2; // Hash of the complete entity data stream
   int64 lastChange = 3; // unix time
   LayerType type = 4;
   LayerUsageType usageType = 5;
@@ -84,8 +84,8 @@ message Entity {
 
 // Reference a pose in time on a path. This is maybe not enough, depending on transform tree.
 message TransformRef {
-    int64 parentId = 1;
-    int64 timestamp = 19;
+    string parentId = 1;
+    int64 timestamp = 2;
 }
 
 message Transform {
@@ -151,9 +151,8 @@ message Commit {
 }
 
 message Conflict {
-    string mine = 1;
-    string theirs = 2;
-    string base = 3;
+    string path = 1;
+    repeated string objectIds = 2;
 }
 
 //message ObjectVersion {
@@ -174,9 +173,9 @@ message OperationParameter {
     int64                         intval = 2;
     double                        realval = 3;
     string                        strval = 4;
-    int64                         transformval = 5;
+    //string                        transformval = 5; //< is in object
 
-    string objectId = 6;
+    string objectId = 5;
 
     //... or set 1) map; 2) map and layer; 3) map, layer and entity
     int64      entityval = 7; //deprecated
@@ -227,10 +226,25 @@ message RegionData {
 
 message ListMapsRequest {}
 
-service MapService {
-  rpc ListMaps (ListMapsRequest) returns (stream Map);
+enum MessageType
+{
+    MessageTree = 0;
+    MessageEntity = 1;
+    MessageCommit = 2;
+    MessageCheckoutCommit = 3;
+    MessageBranch = 4;
 }
 
-service LayerService {
-  rpc GetRegion ( Region ) returns (stream RegionData);
+message GenericEntry
+{
+    MessageType type = 1;
+    bytes payload = 2;
 }
+
+//service MapService {
+//  rpc ListMaps (ListMapsRequest) returns (stream Map);
+//}
+
+//service LayerService {
+//  rpc GetRegion ( Region ) returns (stream RegionData);
+//}
