@@ -123,6 +123,10 @@ message Branch {
     string commitId = 2;
 }
 
+message CheckoutObj {
+    //string name = 1;
+    Commit commit = 1;
+}
 message Commit {
     string commitId = 1;
     repeated string parentCommitIds = 2;
@@ -231,14 +235,22 @@ enum MessageType
     MessageTree = 0;
     MessageEntity = 1;
     MessageCommit = 2;
-    MessageCheckoutCommit = 3;
+    MessageCheckout = 3;
     MessageBranch = 4;
+    MessageEntityData = 5;
+    MessageEmpty = 6;
 }
 
 message GenericEntry
 {
     MessageType type = 1;
-    bytes payload = 2;
+
+    Tree tree = 2;
+    Entity entity = 3;
+    Commit commit = 4;
+    CheckoutObj checkout = 5;
+    Branch branch = 6;
+    bytes entityData = 7;
 }
 
 //service MapService {
