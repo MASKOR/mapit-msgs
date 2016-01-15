@@ -119,14 +119,17 @@ message CommitRef {
 }
 
 message Branch {
-    string name = 1;
+//    string name = 1;
     string commitId = 2;
 }
 
 message CheckoutObj {
-    //string name = 1;
     Commit commit = 1;
+    // stored references or copies. Contains all data of the checkout.
+    // Advantage over git. not copy is created
+    map<string, GenericEntryOrReference> pathToEntries = 2;
 }
+
 message Commit {
     string commitId = 1;
     repeated string parentCommitIds = 2;
@@ -239,6 +242,12 @@ enum MessageType
     MessageBranch = 4;
     MessageEntityData = 5;
     MessageEmpty = 6;
+}
+
+message GenericEntryOrRef
+{
+    GenericEntry entry = 1;
+    string reference = 2;
 }
 
 message GenericEntry
