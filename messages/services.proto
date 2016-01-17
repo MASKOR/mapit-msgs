@@ -80,7 +80,6 @@ message Entity {
   LayerType type = 4;
   LayerUsageType usageType = 5;
   TransformRef transform = 6;
-  LayerType type = 4;
 }
 
 // Reference a pose in time on a path. This is maybe not enough, depending on transform tree.
@@ -275,7 +274,7 @@ enum MessageType
     MessageEmpty = 6;
 }
 
-message GenericEntryOrRef
+message GenericEntryOrReference
 {
     GenericEntry entry = 1;
     string reference = 2;
