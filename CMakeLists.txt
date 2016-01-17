@@ -65,7 +65,8 @@ set_source_files_properties(${MESSAGES_SRCS} ${MESSAGES_HDRS} PROPERTIES GENERAT
 ########
 include_directories(${UPNS_INTERFACE_INCLUDE})
 
-add_library(${PROJECT_NAME} SHARED ${MESSAGES_SRCS} ${MESSAGES_HDRS})
+#Note: On Win32 this can not be a 'shared' library as it would create a dll without any exported symbols! Thus, make it a static linked library
+add_library(${PROJECT_NAME} ${MESSAGES_SRCS} ${MESSAGES_HDRS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 
 # all projects depending on this will include PROTOBUF_OUTPUT_DIR
