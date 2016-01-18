@@ -30,7 +30,6 @@ use_protobuf()
 foreach(FIL ${ProtoFiles})
     get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
     get_filename_component(FIL_WE ${FIL} NAME_WE)
-    message("PROTOBUF generatres: " ${FIL_WE})
 #    add_custom_command(
 #        OUTPUT "${FIL_WE}.grpc.pb.cc"
 #             "${FIL_WE}.grpc.pb.h"
