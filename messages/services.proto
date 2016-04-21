@@ -17,7 +17,6 @@ package upns;
  *    When writing in the context of this commit, changes are indexed/appended to a protocol.
  */
 message Tree {
-    string id = 1;
     map<string, ObjectReference> refs = 2;
 }
 
@@ -109,12 +108,10 @@ enum LayerUsageType {
 //}
 
 message Entity {
-  string id = 1;
-  string dataId = 2; // Hash of the complete entity data stream
-  int64 lastChange = 3; // unix time
-  LayerType type = 4;
-  LayerUsageType usageType = 5;
-  TransformRef transform = 6;
+  string dataId = 1; // Hash of the complete entity data stream
+  LayerType type = 3;
+  LayerUsageType usageType = 4;
+  TransformRef transform = 5;
 }
 
 // Reference a pose in time on a path. This is maybe not enough, depending on transform tree.
@@ -169,7 +166,6 @@ message CheckoutObj {
 }
 
 message Commit {
-    string commitId = 1;
     repeated string parentCommitIds = 2;
     repeated OperationDescription ops = 3; // Also tracks renames via "update metadata" operator. Thus the history of a map can be restored, although the name changed.
 //    repeated ObjectVersion maps = 4;
