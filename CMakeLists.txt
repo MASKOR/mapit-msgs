@@ -73,7 +73,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 # all projects depending on this will include PROTOBUF_OUTPUT_DIR
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_OUTPUT_DIR})
 
-# make qml visible in qtcreator
+# make proto visible in qtcreator
 file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/messages/*.proto)
 
 add_custom_target(${PROJECT_NAME}_ADDITIONAL_PROJECT_FILES ALL ${CMAKE_COMMAND} -E echo "Add proto files to project" SOURCES ${UPNS_PROTOFILES})

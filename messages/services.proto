@@ -204,25 +204,26 @@ message Conflict {
 message OperationDescription {
     string operatorName = 1;
     int32 operatorVersion = 2;
-    repeated OperationParameter params = 3;
+    string params = 3;
+    //repeated OperationParameter params = 3;
 }
 
-message OperationParameter {
-    string                        key = 1;
+//message OperationParameter {
+//    string                        key = 1;
 
-    //optional, set one of these three
-    int64                         intval = 2;
-    double                        realval = 3;
-    string                        strval = 4;
-    //string                        transformval = 5; //< is in object
+//    //optional, set one of these three
+//    int64                         intval = 2;
+//    double                        realval = 3;
+//    string                        strval = 4;
+//    //string                        transformval = 5; //< is in object
 
-    string objectId = 5;
+//    string objectId = 5;
 
-    //... or set 1) map; 2) map and layer; 3) map, layer and entity
-    int64      entityval = 7; //deprecated
-    int64       layerval = 8; //deprecated
-    int64         mapval = 9; //deprecated
-}
+//    //... or set 1) map; 2) map and layer; 3) map, layer and entity
+//    int64      entityval = 7; //deprecated
+//    int64       layerval = 8; //deprecated
+//    int64         mapval = 9; //deprecated
+//}
 
 //message OperationParameterEntity {
 //    int64 mapId = 1;
