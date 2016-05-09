@@ -166,8 +166,11 @@ message CheckoutObj {
 }
 
 message Commit {
-    repeated string parentCommitIds = 2;
-    repeated OperationDescription ops = 3; // Also tracks renames via "update metadata" operator. Thus the history of a map can be restored, although the name changed.
+    string commitMessage = 1;
+    string author = 2;
+    int64  datetime = 3;
+    repeated string parentCommitIds = 4;
+    repeated OperationDescription ops = 5; // Also tracks renames via "update metadata" operator. Thus the history of a map can be restored, although the name changed.
 //    repeated ObjectVersion maps = 4;
 //    repeated ObjectVersion entities = 5;
 
@@ -178,17 +181,17 @@ message Commit {
         string parentObjectId = 2;
     }
 
-    repeated ObjectIdPair transitions = 4;
+    repeated ObjectIdPair transitions = 6;
 
     // contains all hashes after each (StreamProvider write) step
     message ObjectIdList {
         string sourceObjectId = 1;
         repeated string objectId = 2;
     }
-    repeated ObjectIdList detailedTransitions = 5;
+    repeated ObjectIdList detailedTransitions = 7;
 
     // Entrypoint to Tree with children hierarchy: root-> maps -> layers -> entities
-    string root = 6;
+    string root = 8;
 }
 
 message Conflict {
