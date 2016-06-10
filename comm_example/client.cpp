@@ -35,7 +35,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <protobuf_comm/peer.h>
+#include <protobuf_comm/client.h>
 
 #include <boost/asio.hpp>
 #include <boost/date_time.hpp>
@@ -44,8 +44,7 @@
 using namespace protobuf_comm;
 
 static bool quit = false;
-ProtobufBroadcastPeer *peer_public_ = NULL;
-ProtobufBroadcastPeer *peer_team_ = NULL;
+ProtobufStreamClient *client_ = NULL;
 
 void
 signal_handler(const boost::system::error_code& error, int signum)
@@ -56,22 +55,8 @@ signal_handler(const boost::system::error_code& error, int signum)
 }
 
 void
-handle_recv_error(boost::asio::ip::udp::endpoint &endpoint, std::string msg)
-{
-  printf("Receive error from %s:%u: %s\n",
-     endpoint.address().to_string().c_str(), endpoint.port(), msg.c_str());
-}
-
-void
-handle_send_error(std::string msg)
-{
-  printf("Send error: %s\n", msg.c_str());
-}
-
-void
-handle_message(boost::asio::ip::udp::endpoint &sender,
-	       uint16_t component_id, uint16_t msg_type,
-	       std::shared_ptr<google::protobuf::Message> msg)
+handle_message(uint16_t comp_id, uint16_t msg_type,
+               std::shared_ptr<google::protobuf::Message> msg)
 {
   std::shared_ptr<upns::PointCloud> pc;
   if ((pc = std::dynamic_pointer_cast<upns::PointCloud>(msg))) {
@@ -84,27 +69,22 @@ handle_message(boost::asio::ip::udp::endpoint &sender,
 int
 main(int argc, char **argv)
 {
-  peer_public_ = new ProtobufBroadcastPeer(
-        "127.0.0.1",
-	      4444,
-        4445
-      );
-//    peer_public_ = new ProtobufBroadcastPeer(config_->get_string("/llsfrb/comm/public-peer/host"),
-//					     config_->get_uint("/llsfrb/comm/public-peer/port"));
+  client_ = new ProtobufStreamClient();
 
-  MessageRegister & message_register = peer_public_->message_register();
+  client_->async_connect("127.0.0.1", 4444);
+  while ( ! client_->connected() ) {
+    printf("sleep untill connection is established...\n");
+    sleep(1);
+  }
+
+  MessageRegister & message_register = client_->message_register();
   message_register.add_message_type<upns::PointCloud>();
-//  message_register.add_message_type<GameState>();
-//  message_register.add_message_type<MachineInfo>();
-
-  boost::asio::io_service io_service;
 
   printf("Waiting for beacon from upns FH-AC server...\n");
 
-  peer_public_->signal_received().connect(handle_message);
-  peer_public_->signal_recv_error().connect(handle_recv_error);
-  peer_public_->signal_send_error().connect(handle_send_error);
+  client_->signal_received().connect( handle_message );
 
+  boost::asio::io_service io_service;
 #if BOOST_ASIO_VERSION >= 100601
   // Construct a signal set registered for process termination.
   boost::asio::signal_set signals(io_service, SIGINT, SIGTERM);
@@ -117,14 +97,14 @@ main(int argc, char **argv)
   pb_request.set_sender_name("client example");
   pb_request.set_type(upns::Request::POINTCLOUD);
 
-  peer_public_->send(pb_request);
+  client_->send(pb_request);
 
   do {
     io_service.run();
     io_service.reset();
   } while (! quit);
 
-  delete peer_public_;
+  delete client_;
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();

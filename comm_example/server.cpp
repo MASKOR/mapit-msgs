@@ -35,7 +35,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <protobuf_comm/peer.h>
+#include <protobuf_comm/server.h>
 
 #include <boost/asio.hpp>
 #include <boost/date_time.hpp>
@@ -44,33 +44,27 @@
 using namespace protobuf_comm;
 
 static bool quit = false;
-ProtobufBroadcastPeer *peer_public_ = NULL;
+
+ProtobufStreamServer *server_ = NULL;
 
 void
-signal_handler(const boost::system::error_code& error, int signum)
+handle_server_client_connected(ProtobufStreamServer::ClientID client,
+                               boost::asio::ip::tcp::endpoint &endpoint)
 {
-  if (!error) {
-    quit = true;
-  }
+  printf("Client connected\n");
 }
 
 void
-handle_recv_error(boost::asio::ip::udp::endpoint &endpoint, std::string msg)
+handle_server_client_disconnected(ProtobufStreamServer::ClientID client,
+                   const boost::system::error_code &error)
 {
-  printf("Receive error from %s:%u: %s\n",
-     endpoint.address().to_string().c_str(), endpoint.port(), msg.c_str());
+  printf("Client disconnected\n");
 }
 
 void
-handle_send_error(std::string msg)
-{
-  printf("Send error: %s\n", msg.c_str());
-}
-
-void
-handle_message(boost::asio::ip::udp::endpoint &sender,
-	       uint16_t component_id, uint16_t msg_type,
-	       std::shared_ptr<google::protobuf::Message> msg)
+handle_message(protobuf_comm::ProtobufStreamServer::ClientID client,
+               uint16_t component_id, uint16_t msg_type,
+               std::shared_ptr<google::protobuf::Message> msg)
 {
   std::shared_ptr<upns::Request> rq;
   if ((rq = std::dynamic_pointer_cast<upns::Request>(msg))) {
@@ -78,12 +72,12 @@ handle_message(boost::asio::ip::udp::endpoint &sender,
     if ( rq->type() == upns::Request::TEXT_OUTPUT ) {
       printf("Got request \"TEXT_OUTPUT\" from \"%s\", will send no reply\n", rq->sender_name().c_str());
     } else if ( rq->type() == upns::Request::POINTCLOUD ) {
-      printf("Got request \"POINTCLOUD\" from \"%s\", will send pointcloud\n", rq->sender_name().c_str());
+      printf("Got request \"POINTCLOUD\" from \"%s\", will send pointcloud to %u\n", rq->sender_name().c_str(), client);
 
       upns::PointCloud pc;
-      pc.set_pointcloud("abc");
+      pc.set_pointcloud("Hello Daniel");
 
-      peer_public_->send(pc);
+      server_->send(client, pc);
     }
 
   } else {
@@ -93,44 +87,32 @@ handle_message(boost::asio::ip::udp::endpoint &sender,
   }
 }
 
+void
+handle_server_client_fail(protobuf_comm::ProtobufStreamServer::ClientID client,
+           uint16_t component_id, uint16_t msg_type,
+           std::string msg) {
+  printf("Receive error\n");
+}
+
+
 int
 main(int argc, char **argv)
 {
-  peer_public_ = new ProtobufBroadcastPeer(
-        "127.0.0.1",
-        4445,
-        4444
-      );
-//    peer_public_ = new ProtobufBroadcastPeer(config_->get_string("/llsfrb/comm/public-peer/host"),
-//					     config_->get_uint("/llsfrb/comm/public-peer/port"));
+  MessageRegister * message_register = new MessageRegister();
+  message_register->add_message_type<upns::Request>();
 
-  MessageRegister & message_register = peer_public_->message_register();
-  message_register.add_message_type<upns::Request>();
-//  message_register.add_message_type<GameState>();
-//  message_register.add_message_type<MachineInfo>();
+  server_ = new ProtobufStreamServer(4444, message_register);
 
-  boost::asio::io_service io_service;
+  server_->signal_received()
+      .connect( handle_message );
+  server_->signal_receive_failed()
+      .connect( handle_server_client_fail );
 
-  printf("ready to receive requests from upns partners...\n");
+  printf("ready to receive requests from upns partners (for 1 hour)...\n");
+  sleep(3600);
 
-  peer_public_->signal_received().connect(handle_message);
-  peer_public_->signal_recv_error().connect(handle_recv_error);
-  peer_public_->signal_send_error().connect(handle_send_error);
-
-#if BOOST_ASIO_VERSION >= 100601
-  // Construct a signal set registered for process termination.
-  boost::asio::signal_set signals(io_service, SIGINT, SIGTERM);
-
-  // Start an asynchronous wait for one of the signals to occur.
-  signals.async_wait(signal_handler);
-#endif
-
-  do {
-    io_service.run();
-    io_service.reset();
-  } while (! quit);
-
-  delete peer_public_;
+  delete server_;
+  delete message_register;
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();
