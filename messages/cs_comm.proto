@@ -39,7 +39,7 @@ package upns;
 message Request {
   enum CompType {
     COMP_ID  = 1000;
-    MSG_TYPE = 01;
+    MSG_TYPE = 04;
   }
 
   enum Type {
@@ -51,12 +51,44 @@ message Request {
   required Type     type = 2;
 }
 
-message PointCloud {
+message PCLHeader {
+  enum CompType {
+    COMP_ID  = 1000;
+    MSG_TYPE = 01;
+  }
+
+  required uint32 seq      = 1;
+  required uint64 stamp    = 2;
+  required string frame_id = 3;
+}
+
+message PCLPointField {
   enum CompType {
     COMP_ID  = 1000;
     MSG_TYPE = 02;
   }
 
-  required string pointcloud = 1;
+  required string name     = 1;
+  required uint32 offset   = 2;
+  required uint32 datatype = 3;
+  required uint32 count    = 4;
+}
+
+message PCLPointCloud2 {
+  enum CompType {
+    COMP_ID  = 1000;
+    MSG_TYPE = 03;
+  }
+
+  required PCLHeader     header       = 1;
+  required uint32        height       = 2;
+  required uint32        width        = 3;
+  repeated PCLPointField fields       = 4;
+  required uint32        is_bigendian = 5;
+  required uint32        point_step   = 6;
+  required uint32        row_step     = 7;
+  required bytes         data         = 8;
+  required bool          is_dense     = 9;
+
 }
 

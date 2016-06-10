@@ -39,6 +39,12 @@
 
 #include <boost/asio.hpp>
 #include <boost/date_time.hpp>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+
 #include "cs_comm.pb.h"
 
 using namespace protobuf_comm;
@@ -46,6 +52,24 @@ using namespace protobuf_comm;
 static bool quit = false;
 
 ProtobufStreamServer *server_ = NULL;
+
+bool
+load_pcd(std::string file_name, pcl::PCLPointCloud2 & point_cloud)
+{
+  printf("Start to read: %s\n", file_name.c_str());
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
+  if (pcl::io::loadPCDFile<pcl::PointXYZ> (file_name, *cloud) == -1) {
+    PCL_ERROR ("Couldn't read file: %s \n", file_name.c_str());
+    return false;
+  }
+
+  pcl::toPCLPointCloud2(*cloud, point_cloud);
+
+  printf("Done reading file\n");
+
+  return true;
+}
 
 void
 handle_server_client_connected(ProtobufStreamServer::ClientID client,
@@ -74,16 +98,37 @@ handle_message(protobuf_comm::ProtobufStreamServer::ClientID client,
     } else if ( rq->type() == upns::Request::POINTCLOUD ) {
       printf("Got request \"POINTCLOUD\" from \"%s\", will send pointcloud to %u\n", rq->sender_name().c_str(), client);
 
-      upns::PointCloud pc;
-      pc.set_pointcloud("Hello Daniel");
+      pcl::PCLPointCloud2 pc;
+      if ( load_pcd("example_send.pcd", pc) ) {
+        upns::PCLPointCloud2 msg_pc;
 
-      server_->send(client, pc);
+        msg_pc.mutable_header()->set_seq( pc.header.seq );
+        msg_pc.mutable_header()->set_stamp( pc.header.stamp );
+        msg_pc.mutable_header()->set_frame_id( pc.header.frame_id );
+
+        msg_pc.set_height( pc.height );
+        msg_pc.set_width( pc.width );
+        for ( pcl::PCLPointField field : pc.fields ) {
+          upns::PCLPointField* pf = msg_pc.add_fields();
+
+          pf->set_name( field.name );
+          pf->set_offset( field.offset );
+          pf->set_datatype( field.datatype );
+          pf->set_count( field.count );
+        }
+        msg_pc.set_is_bigendian( pc.is_bigendian );
+        msg_pc.set_point_step( pc.point_step );
+        msg_pc.set_row_step( pc.row_step );
+        msg_pc.set_is_dense( pc.is_dense );
+
+        msg_pc.set_data( pc.data.data(), pc.data.size() );
+
+        server_->send(client, msg_pc);
+      }
     }
 
   } else {
-
     printf("RECEIVED UNKNOWN Protobuf msg\n");
-
   }
 }
 
@@ -93,7 +138,6 @@ handle_server_client_fail(protobuf_comm::ProtobufStreamServer::ClientID client,
            std::string msg) {
   printf("Receive error\n");
 }
-
 
 int
 main(int argc, char **argv)

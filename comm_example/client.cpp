@@ -39,6 +39,13 @@
 
 #include <boost/asio.hpp>
 #include <boost/date_time.hpp>
+
+//#include <pcl/io/pcd_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+
 #include "cs_comm.pb.h"
 
 using namespace protobuf_comm;
@@ -54,13 +61,72 @@ signal_handler(const boost::system::error_code& error, int signum)
   }
 }
 
+pcl::PCLPointCloud2
+proto_to_pcl2(std::shared_ptr<upns::PCLPointCloud2> msg_pc)
+{
+  pcl::PCLPointCloud2 pc;
+
+  pc.header.seq = msg_pc->header().seq();
+  pc.header.stamp = msg_pc->header().stamp();
+  pc.header.frame_id = msg_pc->header().frame_id();
+
+  pc.height = msg_pc->height();
+  pc.width = msg_pc->width();
+
+  for ( upns::PCLPointField field : msg_pc->fields() ) {
+    pcl::PCLPointField pf;
+    pf.name = field.name();
+    pf.offset = field.offset();
+    pf.datatype = field.datatype();
+    pf.count = field.count();
+
+    pc.fields.push_back( pf );
+  }
+
+  pc.is_bigendian = msg_pc->is_bigendian();
+  pc.point_step = msg_pc->point_step();
+  pc.row_step = msg_pc->row_step();
+  pc.is_dense = msg_pc->is_dense();
+
+  pc.data.insert(pc.data.end(),
+                 msg_pc->data().c_str(),
+                 msg_pc->data().c_str() + msg_pc->data().size()
+  );
+
+  return pc;
+}
+
+void
+open_viewer(pcl::PCLPointCloud2 pc)
+{
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::fromPCLPointCloud2(pc, *cloud);
+//    pcl::io::savePCDFileBinary("received.pcd", cloud);
+
+  pcl::visualization::PCLVisualizer viewer("3D Viewer");
+  viewer.setBackgroundColor (0, 0, 0);
+  viewer.addPointCloud<pcl::PointXYZ> (cloud, "sample cloud");
+  viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
+  viewer.addCoordinateSystem (1.0);
+  viewer.initCameraParameters ();
+
+  while (!viewer.wasStopped ()) {
+    viewer.spinOnce (100);
+    boost::this_thread::sleep (boost::posix_time::microseconds (100000));
+  }
+}
+
 void
 handle_message(uint16_t comp_id, uint16_t msg_type,
                std::shared_ptr<google::protobuf::Message> msg)
 {
-  std::shared_ptr<upns::PointCloud> pc;
-  if ((pc = std::dynamic_pointer_cast<upns::PointCloud>(msg))) {
-    printf("PointCloud received: %s\n", pc->pointcloud().c_str());
+  std::shared_ptr<upns::PCLPointCloud2> msg_pc;
+  if ((msg_pc = std::dynamic_pointer_cast<upns::PCLPointCloud2>(msg))) {
+    printf("received PCLPointCloud2, going to display...\n");
+
+    pcl::PCLPointCloud2 pc = proto_to_pcl2(msg_pc);
+    open_viewer(pc);
+
   } else {
     printf("RECEIVED UNKNOWN Protobuf msg\n");
   }
@@ -78,7 +144,7 @@ main(int argc, char **argv)
   }
 
   MessageRegister & message_register = client_->message_register();
-  message_register.add_message_type<upns::PointCloud>();
+  message_register.add_message_type<upns::PCLPointCloud2>();
 
   printf("Waiting for beacon from upns FH-AC server...\n");
 

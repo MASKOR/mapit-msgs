@@ -34,6 +34,14 @@ file(GLOB ProtoFiles ${PROJECT_SOURCE_DIR}/../messages/*.proto)
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
 set (COMM_EXE ${COMM_EXE} ${PROTO_SRCS} ${PROTO_HDRS})
 
+#pcl
+find_package(PCL 1.2 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+set (COMM_LIBS ${COMM_LIBS} ${PCL_LIBRARIES})
+
 add_executable(client client.cpp ${COMM_EXE})
 target_link_libraries(client ${COMM_LIBS})
 
