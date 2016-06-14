@@ -36,6 +36,7 @@
  */
 
 #include <zmq.hpp>
+#include <pthread.h>
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -64,66 +65,58 @@ load_pcd(std::string file_name, pcl::PCLPointCloud2 & point_cloud)
   return true;
 }
 
-//void
-//handle_message(protobuf_comm::ProtobufStreamServer::ClientID client,
-//               uint16_t component_id, uint16_t msg_type,
-//               std::shared_ptr<google::protobuf::Message> msg)
-//{
-//  std::shared_ptr<upns::Request> rq;
-//  if ((rq = std::dynamic_pointer_cast<upns::Request>(msg))) {
+void *
+socket_callback (void *arg)
+{
+  printf("received callback\n");
 
-//    if ( rq->type() == upns::Request::TEXT_OUTPUT ) {
-//      printf("Got request \"TEXT_OUTPUT\" from \"%s\", will send no reply\n", rq->sender_name().c_str());
-//    } else if ( rq->type() == upns::Request::POINTCLOUD ) {
-//      printf("Got request \"POINTCLOUD\" from \"%s\", will send pointcloud to %u\n", rq->sender_name().c_str(), client);
+  zmq::context_t *context = (zmq::context_t *) arg;
 
-//      pcl::PCLPointCloud2 pc;
-//      if ( load_pcd("example_send.pcd", pc) ) {
-//        upns::PCLPointCloud2 msg_pc;
+  zmq::socket_t socket (*context, ZMQ_REP);
+  socket.connect ("inproc://workers");
 
-//        msg_pc.mutable_header()->set_seq( pc.header.seq );
-//        msg_pc.mutable_header()->set_stamp( pc.header.stamp );
-//        msg_pc.mutable_header()->set_frame_id( pc.header.frame_id );
+  while (true) {
+    //  Wait for next request from client
+    zmq::message_t request;
+    socket.recv (&request);
+    std::cout << "Received request: [" << (char*) request.data() << "]" << std::endl;
 
-//        msg_pc.set_height( pc.height );
-//        msg_pc.set_width( pc.width );
-//        for ( pcl::PCLPointField field : pc.fields ) {
-//          upns::PCLPointField* pf = msg_pc.add_fields();
+    //  Do some 'work'
+    sleep (10);
 
-//          pf->set_name( field.name );
-//          pf->set_offset( field.offset );
-//          pf->set_datatype( field.datatype );
-//          pf->set_count( field.count );
-//        }
-//        msg_pc.set_is_bigendian( pc.is_bigendian );
-//        msg_pc.set_point_step( pc.point_step );
-//        msg_pc.set_row_step( pc.row_step );
-//        msg_pc.set_is_dense( pc.is_dense );
-
-//        msg_pc.set_data( pc.data.data(), pc.data.size() );
-
-//        server_->send(client, msg_pc);
-//      }
-//    }
-
-//  } else {
-//    printf("RECEIVED UNKNOWN Protobuf msg\n");
-//  }
-//}
+    //  Send reply back to client
+    zmq::message_t reply (6);
+    memcpy ((void *) reply.data (), "World", 6);
+    socket.send (reply);
+  }
+  return (NULL);
+}
 
 int
 main(int argc, char **argv)
 {
+  //  Prepare context and sockets
   zmq::context_t context (1);
-//  server_ = new ProtobufStreamServer(4444, message_register);
+  zmq::socket_t socket (context, ZMQ_ROUTER);
 
-//  server_->signal_received()
-//      .connect( handle_message );
-//  server_->signal_receive_failed()
-//      .connect( handle_server_client_fail );
+  socket.bind("tcp://*:4444");
+  zmq::socket_t workers (context, ZMQ_DEALER);
+  workers.bind ("inproc://workers");
 
-  printf("ready to receive requests from upns partners (for 1 hour)...\n");
-  sleep(3600);
+  //  Launch pool of worker threads
+  for (int thread_nbr = 0; thread_nbr < 5; thread_nbr++) {
+      pthread_t worker;
+
+      pthread_create (&worker, NULL, socket_callback, (void *) &context);
+  }
+
+  printf("ready to receive requests from upns partners ...\n");
+
+  //  Connect work threads to client threads via a queue
+  zmq::proxy(static_cast<void *>(socket), static_cast<void *>(workers), nullptr);
+
+//  printf("ready to receive requests from upns partners (for 1 hour)...\n");
+//  sleep(3600);
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();
