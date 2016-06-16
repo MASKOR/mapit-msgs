@@ -35,13 +35,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <zmq.hpp>
-#include <pthread.h>
-
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/conversions.h>
+
+#include "zmq_pair.h"
 
 #include "cs_comm.pb.h"
 
@@ -65,58 +64,33 @@ load_pcd(std::string file_name, pcl::PCLPointCloud2 & point_cloud)
   return true;
 }
 
-void *
-socket_callback (void *arg)
-{
-  printf("received callback\n");
+//void
+//process_client_request(std::string &msg)
+//{
 
-  zmq::context_t *context = (zmq::context_t *) arg;
 
-  zmq::socket_t socket (*context, ZMQ_REP);
-  socket.connect ("inproc://workers");
-
-  while (true) {
-    //  Wait for next request from client
-    zmq::message_t request;
-    socket.recv (&request);
-    std::cout << "Received request: [" << (char*) request.data() << "]" << std::endl;
-
-    //  Do some 'work'
-    sleep (10);
-
-    //  Send reply back to client
-    zmq::message_t reply (6);
-    memcpy ((void *) reply.data (), "World", 6);
-    socket.send (reply);
-  }
-  return (NULL);
-}
+//}
 
 int
 main(int argc, char **argv)
 {
-  //  Prepare context and sockets
-  zmq::context_t context (1);
-  zmq::socket_t socket (context, ZMQ_ROUTER);
+  ZMQPair server;
+  server.bind("tcp://*:4444");
 
-  socket.bind("tcp://*:4444");
-  zmq::socket_t workers (context, ZMQ_DEALER);
-  workers.bind ("inproc://workers");
+  while (true) {
+    std::shared_ptr<std::string> msg = server.receive();
 
-  //  Launch pool of worker threads
-  for (int thread_nbr = 0; thread_nbr < 5; thread_nbr++) {
-      pthread_t worker;
+//    process_client_request(msg_str);
+    upns::PCLPointField pb_request;
+    if ( pb_request.ParseFromString( *msg ) ) {
+      printf("is upns::Request\n");
+    } else {
+      printf("is NOT upns::Request\n");
+    }
 
-      pthread_create (&worker, NULL, socket_callback, (void *) &context);
+    std::shared_ptr<std::string> reply(new std::string("antwort"));
+    server.send(reply);
   }
-
-  printf("ready to receive requests from upns partners ...\n");
-
-  //  Connect work threads to client threads via a queue
-  zmq::proxy(static_cast<void *>(socket), static_cast<void *>(workers), nullptr);
-
-//  printf("ready to receive requests from upns partners (for 1 hour)...\n");
-//  sleep(3600);
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();

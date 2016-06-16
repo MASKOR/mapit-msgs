@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.5)
-project (comm_test)
+project (comm_test_protobuf_comm)
 
 # cpp11
 include(CheckCXXCompilerFlag)

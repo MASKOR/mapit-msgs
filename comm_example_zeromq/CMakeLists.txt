@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.5)
-project (comm_test)
+project (comm_test_zmq)
 
 # cpp11
 include(CheckCXXCompilerFlag)
@@ -49,5 +49,9 @@ set (COMM_LIBS ${COMM_LIBS} ${PCL_LIBRARIES})
 add_executable(client client.cpp ${COMM_EXE})
 target_link_libraries(client ${COMM_LIBS})
 
-add_executable(server server.cpp ${COMM_EXE})
+add_executable(server
+    server.cpp
+    zmq_pair.cpp
+    ${COMM_EXE}
+)
 target_link_libraries(server ${COMM_LIBS})

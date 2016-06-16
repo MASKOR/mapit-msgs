@@ -37,6 +37,11 @@ syntax = "proto3";
 
 package upns;
 
+message Header {
+  uint32 COMP_ID  = 1;
+  uint32 MSG_TYPE = 2;
+}
+
 message Request {
   enum CompType {
     PROTO_3  = 0;

@@ -133,60 +133,28 @@ main(int argc, char **argv)
 {
   //  Prepare our context and socket
   zmq::context_t context (1);
-  zmq::socket_t socket (context, ZMQ_REQ);
+  zmq::socket_t socket_send(context, ZMQ_PAIR);
 
   std::cout << "Connecting to hello world server..." << std::endl;
-  socket.connect ("tcp://localhost:4444");
+  socket_send.connect ("tcp://localhost:4444");
 
-  //  Do 10 requests, waiting each time for a response
-  for (int request_nbr = 0; request_nbr != 10; request_nbr++) {
-    zmq::message_t request (6);
-    memcpy (request.data (), "Hello", 6);
-    std::cout << "Sending Hello " << request_nbr << "..." << std::endl;
-    socket.send (request);
+  upns::Request pb_request;
+  pb_request.set_sender_name("ZMQ client example");
+  pb_request.set_type(upns::Request::POINTCLOUD);
+  std::string pbs;
+  if ( pb_request.SerializeToString(&pbs) ) {
+    zmq::message_t request ( pbs.size() );
+    memcpy (request.data(), pbs.c_str(), pbs.size());
+    socket_send.send (request);
 
     //  Get the reply.
     zmq::message_t reply;
-    socket.recv (&reply);
-    std::cout << "Received World " << request_nbr << std::endl;
+    socket_send.recv (&reply);
+    std::cout << "Received " << (char*)reply.data() << std::endl;
+  } else {
+    printf("proto error");
   }
-//  client_ = new ProtobufStreamClient();
 
-//  client_->async_connect("127.0.0.1", 4444);
-//  while ( ! client_->connected() ) {
-//    printf("sleep untill connection is established...\n");
-//    sleep(1);
-//  }
-
-//  MessageRegister & message_register = client_->message_register();
-//  message_register.add_message_type<upns::PCLPointCloud2>();
-
-//  printf("Waiting for beacon from upns FH-AC server...\n");
-
-//  client_->signal_received().connect( handle_message );
-
-//  boost::asio::io_service io_service;
-//#if BOOST_ASIO_VERSION >= 100601
-//  // Construct a signal set registered for process termination.
-//  boost::asio::signal_set signals(io_service, SIGINT, SIGTERM);
-
-//  // Start an asynchronous wait for one of the signals to occur.
-//  signals.async_wait(signal_handler);
-//#endif
-
-//  upns::Request pb_request;
-//  pb_request.set_sender_name("client example");
-//  pb_request.set_type(upns::Request::POINTCLOUD);
-
-//  client_->send(pb_request);
-
-//  do {
-//    io_service.run();
-//    io_service.reset();
-//  } while (! quit);
-
-//  delete client_;
-
-//  // Delete all global objects allocated by libprotobuf
-//  google::protobuf::ShutdownProtobufLibrary();
+  // Delete all global objects allocated by libprotobuf
+  google::protobuf::ShutdownProtobufLibrary();
 }
