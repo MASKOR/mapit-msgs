@@ -75,21 +75,54 @@ int
 main(int argc, char **argv)
 {
   ZMQPair server;
+  server.add_message_type<upns::Request>();
+
   server.bind("tcp://*:4444");
 
   while (true) {
-    std::shared_ptr<std::string> msg = server.receive();
+    std::shared_ptr< ::google::protobuf::Message> msg = server.receive();
 
-//    process_client_request(msg_str);
-    upns::PCLPointField pb_request;
-    if ( pb_request.ParseFromString( *msg ) ) {
+    std::shared_ptr<upns::Request> pb_request;
+    if ((pb_request = std::dynamic_pointer_cast<upns::Request>(msg))) {
       printf("is upns::Request\n");
-    } else {
-      printf("is NOT upns::Request\n");
-    }
 
-    std::shared_ptr<std::string> reply(new std::string("antwort"));
-    server.send(reply);
+
+    } else {
+      printf("unknown proto type\n");
+    }
+//    if ( pb_request->type() == upns::Request::TEXT_OUTPUT ) {
+//      printf("is upns::Request: Text\nHERE IT IS!!!\n");
+//    } else if ( pb_request->type() == upns::Request::POINTCLOUD ) {
+//      printf("is upns::Request: Point Cloud\n");
+
+////      pcl::PCLPointCloud2 pc;
+////      if ( load_pcd("example_send.pcd", pc) ) {
+////        upns::PCLPointCloud2 msg_pc;
+
+////        msg_pc.mutable_header()->set_seq( pc.header.seq );
+////        msg_pc.mutable_header()->set_stamp( pc.header.stamp );
+////        msg_pc.mutable_header()->set_frame_id( pc.header.frame_id );
+
+////        msg_pc.set_height( pc.height );
+////        msg_pc.set_width( pc.width );
+////        for ( pcl::PCLPointField field : pc.fields ) {
+////          upns::PCLPointField* pf = msg_pc.add_fields();
+
+////          pf->set_name( field.name );
+////          pf->set_offset( field.offset );
+////          pf->set_datatype( field.datatype );
+////          pf->set_count( field.count );
+////        }
+////        msg_pc.set_is_bigendian( pc.is_bigendian );
+////        msg_pc.set_point_step( pc.point_step );
+////        msg_pc.set_row_step( pc.row_step );
+////        msg_pc.set_is_dense( pc.is_dense );
+
+////        msg_pc.set_data( pc.data.data(), pc.data.size() );
+
+////        server_->send(client, msg_pc);
+////      }
+//    }
   }
 
   // Delete all global objects allocated by libprotobuf

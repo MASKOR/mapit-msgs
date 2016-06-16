@@ -35,13 +35,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <zmq.hpp>
-
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/conversions.h>
 
+#include "zmq_pair.h"
 #include "cs_comm.pb.h"
 
 //using namespace protobuf_comm;
@@ -132,28 +131,20 @@ int
 main(int argc, char **argv)
 {
   //  Prepare our context and socket
-  zmq::context_t context (1);
-  zmq::socket_t socket_send(context, ZMQ_PAIR);
-
+  ZMQPair client;
   std::cout << "Connecting to hello world server..." << std::endl;
-  socket_send.connect ("tcp://localhost:4444");
+  client.connect("tcp://localhost:4444");
 
-  upns::Request pb_request;
-  pb_request.set_sender_name("ZMQ client example");
-  pb_request.set_type(upns::Request::POINTCLOUD);
-  std::string pbs;
-  if ( pb_request.SerializeToString(&pbs) ) {
-    zmq::message_t request ( pbs.size() );
-    memcpy (request.data(), pbs.c_str(), pbs.size());
-    socket_send.send (request);
+  std::unique_ptr<upns::Request> pb_request(new upns::Request);
+  pb_request->set_sender_name("ZMQ client example");
+  pb_request->set_type(upns::Request::POINTCLOUD);
 
-    //  Get the reply.
-    zmq::message_t reply;
-    socket_send.recv (&reply);
-    std::cout << "Received " << (char*)reply.data() << std::endl;
-  } else {
-    printf("proto error");
-  }
+  client.send(std::move(pb_request));
+
+//  std::shared_ptr<upns::PCLPointCloud2> pb_reply(new upns::PCLPointCloud2);
+//  client.receive(pb_reply);
+
+//  std::cout << "Received data" << std::endl;
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();

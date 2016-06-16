@@ -46,7 +46,11 @@ add_definitions(${PCL_DEFINITIONS})
 
 set (COMM_LIBS ${COMM_LIBS} ${PCL_LIBRARIES})
 
-add_executable(client client.cpp ${COMM_EXE})
+add_executable(client
+    client.cpp
+    zmq_pair.cpp
+    ${COMM_EXE}
+)
 target_link_libraries(client ${COMM_LIBS})
 
 add_executable(server
