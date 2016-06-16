@@ -1,6 +1,12 @@
 #include "zmq_pair.h"
 #include "cs_comm.pb.h"
 
+void
+my_free(void *data, void *hint)
+{
+    free (data);
+}
+
 ZMQPair::ZMQPair()
 {
   context_ = new zmq::context_t(1);
@@ -18,7 +24,7 @@ void
 ZMQPair::connect(std::string com)
 {
   if (connected_) {
-    // throw
+    // TODO: throw
   }
 
   socket_->connect(com);
@@ -29,18 +35,66 @@ void
 ZMQPair::bind(std::string com)
 {
   if (connected_) {
-    // throw
+    // TODO: throw
   }
 
   socket_->bind(com);
   connected_ = true;
 }
 
+void
+ZMQPair::send_pb_single(std::unique_ptr< ::google::protobuf::Message> msg)
+{
+  int size = msg->ByteSize();
+  zmq::message_t msg_zmq( size );
+  msg->SerializeToArray(msg_zmq.data(), size);
+  socket_->send(msg_zmq);
+}
+
+void
+ZMQPair::send(std::unique_ptr< ::google::protobuf::Message> msg)
+{
+  if ( ! connected_) {
+    // TODO: throw
+  }
+
+  // check for COMP_ID and MSG_TYPE
+  const google::protobuf::Descriptor *desc = msg->GetDescriptor();
+  KeyType key = key_from_desc(desc);
+  int comp_id = key.first;
+  int msg_type = key.second;
+
+  // send header
+  std::unique_ptr<upns::Header> h(new upns::Header);
+  h->set_comp_id(comp_id);
+  h->set_msg_type(msg_type);
+
+  send_pb_single(std::move(h));
+
+  // send msg
+  send_pb_single(std::move(msg));
+}
+
+void
+ZMQPair::send_raw(unsigned char* data, size_t size)
+{
+  std::unique_ptr<upns::RawDataSize> pb(new upns::RawDataSize);
+  pb->set_size(size);
+  send_pb_single(std::move(pb));
+
+  zmq::message_t msg(size);
+  memcpy(msg.data(), data, size);
+  socket_->send(msg);
+//  zmq_msg_t msg_zmq;
+//  zmq_msg_init_data(&msg_zmq, data, size, my_free, NULL);
+//  zmq_send(socket_, &msg_zmq, size, 0);
+}
+
 std::shared_ptr< ::google::protobuf::Message>
 ZMQPair::receive()
 {
   if ( ! connected_) {
-    // throw
+    // TODO: throw
   }
 
   // receive header
@@ -59,34 +113,26 @@ ZMQPair::receive()
   return msg;
 }
 
-void
-ZMQPair::send(std::unique_ptr< ::google::protobuf::Message> msg)
+unsigned char *
+ZMQPair::receive_raw(size_t & size)
 {
-  if ( ! connected_) {
-    // throw
-  }
+  // receive size
+  upns::RawDataSize pb;
+  zmq::message_t msg_pb;
+  socket_->recv( &msg_pb );
+  pb.ParseFromArray(msg_pb.data(), msg_pb.size());
+  size = pb.size();
+  unsigned char * data = (unsigned char *) malloc( size );
 
-  // check for COMP_ID and MSG_TYPE
-  const google::protobuf::Descriptor *desc = msg->GetDescriptor();
-  KeyType key = key_from_desc(desc);
-  int comp_id = key.first;
-  int msg_type = key.second;
+  // receive data
+  zmq::message_t msg;
+  socket_->recv( &msg );
+  memcpy(data, msg.data(), size);
+//  zmq_recv(socket_, data, size, 0);
+//  data = (unsigned char*)msg.data();
+//  size = msg->size();
 
-  // send header
-  upns::Header h;
-  h.set_comp_id(comp_id);
-  h.set_msg_type(msg_type);
-
-  int size = h.ByteSize();
-  zmq::message_t msg_h( size );
-  h.SerializeToArray(msg_h.data(), size);
-  socket_->send(msg_h);
-
-  // send msg
-  size = msg->ByteSize();
-  zmq::message_t msg_zmq( size );
-  msg->SerializeToArray(msg_zmq.data(), size);
-  socket_->send(msg_zmq);
+  return data;
 }
 
 ZMQPair::KeyType

@@ -37,16 +37,23 @@ syntax = "proto3";
 
 package upns;
 
+/**
+ * this message can not be send, it is used internaly for message identification
+ */
 message Header {
   uint32 COMP_ID  = 1;
   uint32 MSG_TYPE = 2;
+}
+
+message RawDataSize {
+  uint32 size  = 1;
 }
 
 message Request {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1000;
-    MSG_TYPE = 04;
+    MSG_TYPE = 01;
   }
 
   enum Type {
@@ -58,10 +65,26 @@ message Request {
   Type     type = 2;
 }
 
+message PCLPointCloud2_empty {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 3000;
+    MSG_TYPE = 01;
+  }
+  PCLHeader     header       = 1;
+  uint32        height       = 2;
+  uint32        width        = 3;
+  repeated PCLPointField fields       = 4;
+  uint32        is_bigendian = 5;
+  uint32        point_step   = 6;
+  uint32        row_step     = 7;
+  bool          is_dense     = 9;
+}
+
 message PCLHeader {
   enum CompType {
     PROTO_3  = 0;
-    COMP_ID  = 1000;
+    COMP_ID  = 2000;
     MSG_TYPE = 01;
   }
 
@@ -73,7 +96,7 @@ message PCLHeader {
 message PCLPointField {
   enum CompType {
     PROTO_3  = 0;
-    COMP_ID  = 1000;
+    COMP_ID  = 2000;
     MSG_TYPE = 02;
   }
 
@@ -86,7 +109,7 @@ message PCLPointField {
 message PCLPointCloud2 {
   enum CompType {
     PROTO_3  = 0;
-    COMP_ID  = 1000;
+    COMP_ID  = 2000;
     MSG_TYPE = 03;
   }
 

@@ -19,6 +19,7 @@ private:
 
   KeyType key_from_desc(const google::protobuf::Descriptor *desc);
   std::shared_ptr< ::google::protobuf::Message> new_message_for(uint16_t component_id, uint16_t msg_type);
+  void send_pb_single(std::unique_ptr< ::google::protobuf::Message> msg);
 public:
   ZMQPair();
   ~ZMQPair();
@@ -26,7 +27,9 @@ public:
   void connect(std::string com);
   void bind(std::string com);
   std::shared_ptr<google::protobuf::Message> receive();
+  unsigned char * receive_raw(size_t & size);
   void send(std::unique_ptr< ::google::protobuf::Message> msg);
+  void send_raw(unsigned char* data, size_t size);
 
   template <class MT>
   typename std::enable_if<std::is_base_of<google::protobuf::Message, MT>::value, void>::type

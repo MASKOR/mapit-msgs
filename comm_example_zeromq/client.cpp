@@ -43,97 +43,87 @@
 #include "zmq_pair.h"
 #include "cs_comm.pb.h"
 
-//using namespace protobuf_comm;
+pcl::PCLPointCloud2
+proto_to_pcl2(std::shared_ptr<upns::PCLPointCloud2_empty> msg_pc)
+{
+  pcl::PCLPointCloud2 pc;
 
-//static bool quit = false;
-//ProtobufStreamClient *client_ = NULL;
+  pc.header.seq = msg_pc->header().seq();
+  pc.header.stamp = msg_pc->header().stamp();
+  pc.header.frame_id = msg_pc->header().frame_id();
 
-//void
-//signal_handler(const boost::system::error_code& error, int signum)
-//{
-//  if (!error) {
-//    quit = true;
-//  }
-//}
+  pc.height = msg_pc->height();
+  pc.width = msg_pc->width();
 
-//pcl::PCLPointCloud2
-//proto_to_pcl2(std::shared_ptr<upns::PCLPointCloud2> msg_pc)
-//{
-//  pcl::PCLPointCloud2 pc;
+  for ( upns::PCLPointField field : msg_pc->fields() ) {
+    pcl::PCLPointField pf;
+    pf.name = field.name();
+    pf.offset = field.offset();
+    pf.datatype = field.datatype();
+    pf.count = field.count();
 
-//  pc.header.seq = msg_pc->header().seq();
-//  pc.header.stamp = msg_pc->header().stamp();
-//  pc.header.frame_id = msg_pc->header().frame_id();
+    pc.fields.push_back( pf );
+  }
 
-//  pc.height = msg_pc->height();
-//  pc.width = msg_pc->width();
+  pc.is_bigendian = msg_pc->is_bigendian();
+  pc.point_step = msg_pc->point_step();
+  pc.row_step = msg_pc->row_step();
+  pc.is_dense = msg_pc->is_dense();
 
-//  for ( upns::PCLPointField field : msg_pc->fields() ) {
-//    pcl::PCLPointField pf;
-//    pf.name = field.name();
-//    pf.offset = field.offset();
-//    pf.datatype = field.datatype();
-//    pf.count = field.count();
+  return pc;
+}
 
-//    pc.fields.push_back( pf );
-//  }
+void
+open_viewer(pcl::PCLPointCloud2 pc)
+{
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::fromPCLPointCloud2(pc, *cloud);
+//    pcl::io::savePCDFileBinary("received.pcd", cloud);
 
-//  pc.is_bigendian = msg_pc->is_bigendian();
-//  pc.point_step = msg_pc->point_step();
-//  pc.row_step = msg_pc->row_step();
-//  pc.is_dense = msg_pc->is_dense();
+  pcl::visualization::PCLVisualizer viewer("3D Viewer");
+  viewer.setBackgroundColor (0, 0, 0);
+  viewer.addPointCloud<pcl::PointXYZ> (cloud, "sample cloud");
+  viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
+  viewer.addCoordinateSystem (1.0);
+  viewer.initCameraParameters ();
 
-//  pc.data.insert(pc.data.end(),
-//                 msg_pc->data().c_str(),
-//                 msg_pc->data().c_str() + msg_pc->data().size()
-//  );
+  while (!viewer.wasStopped ()) {
+    viewer.spinOnce (100);
+    boost::this_thread::sleep (boost::posix_time::microseconds (100000));
+  }
+}
 
-//  return pc;
-//}
+void
+handle_message(ZMQPair & client, std::shared_ptr<google::protobuf::Message> msg)
+{
+  std::shared_ptr<upns::PCLPointCloud2_empty> msg_pc;
+  if ((msg_pc = std::dynamic_pointer_cast<upns::PCLPointCloud2_empty>(msg))) {
+    printf("received PCLPointCloud2, wait for raw data...\n");
 
-//void
-//open_viewer(pcl::PCLPointCloud2 pc)
-//{
-//  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-//  pcl::fromPCLPointCloud2(pc, *cloud);
-////    pcl::io::savePCDFileBinary("received.pcd", cloud);
+    pcl::PCLPointCloud2 pc = proto_to_pcl2(msg_pc);
+    size_t size;
+    unsigned char * data = client.receive_raw(size);
+    pc.data.insert(pc.data.end(),
+                   data,
+                   data + size
+    );
 
-//  pcl::visualization::PCLVisualizer viewer("3D Viewer");
-//  viewer.setBackgroundColor (0, 0, 0);
-//  viewer.addPointCloud<pcl::PointXYZ> (cloud, "sample cloud");
-//  viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
-//  viewer.addCoordinateSystem (1.0);
-//  viewer.initCameraParameters ();
+    printf("received raw data, going to display...\n");
+    open_viewer(pc);
 
-//  while (!viewer.wasStopped ()) {
-//    viewer.spinOnce (100);
-//    boost::this_thread::sleep (boost::posix_time::microseconds (100000));
-//  }
-//}
-
-//void
-//handle_message(uint16_t comp_id, uint16_t msg_type,
-//               std::shared_ptr<google::protobuf::Message> msg)
-//{
-//  std::shared_ptr<upns::PCLPointCloud2> msg_pc;
-//  if ((msg_pc = std::dynamic_pointer_cast<upns::PCLPointCloud2>(msg))) {
-//    printf("received PCLPointCloud2, going to display...\n");
-
-//    pcl::PCLPointCloud2 pc = proto_to_pcl2(msg_pc);
-//    open_viewer(pc);
-
-//  } else {
-//    printf("RECEIVED UNKNOWN Protobuf msg\n");
-//  }
-//}
+  } else {
+    printf("RECEIVED UNKNOWN Protobuf msg\n");
+  }
+}
 
 int
 main(int argc, char **argv)
 {
   //  Prepare our context and socket
   ZMQPair client;
+  client.add_message_type<upns::PCLPointCloud2_empty>();
   std::cout << "Connecting to hello world server..." << std::endl;
-  client.connect("tcp://localhost:4444");
+  client.connect("tcp://localhost:4445");
 
   std::unique_ptr<upns::Request> pb_request(new upns::Request);
   pb_request->set_sender_name("ZMQ client example");
@@ -141,10 +131,9 @@ main(int argc, char **argv)
 
   client.send(std::move(pb_request));
 
-//  std::shared_ptr<upns::PCLPointCloud2> pb_reply(new upns::PCLPointCloud2);
-//  client.receive(pb_reply);
-
-//  std::cout << "Received data" << std::endl;
+  std::shared_ptr< ::google::protobuf::Message> pb_reply = client.receive();
+  std::cout << "Received data" << std::endl;
+  handle_message(client, pb_reply);
 
   // Delete all global objects allocated by libprotobuf
   google::protobuf::ShutdownProtobufLibrary();
