@@ -1,5 +1,5 @@
 #include "zmq_pair.h"
-#include "cs_comm.pb.h"
+#include "transport.pb.h"
 
 void
 my_free(void *data, void *hint)

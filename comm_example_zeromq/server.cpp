@@ -43,6 +43,7 @@
 #include "zmq_pair.h"
 
 #include "cs_comm.pb.h"
+#include "transport.pb.h"
 
 static bool quit = false;
 

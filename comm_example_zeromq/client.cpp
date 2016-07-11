@@ -42,6 +42,7 @@
 
 #include "zmq_pair.h"
 #include "cs_comm.pb.h"
+#include "transport.pb.h"
 
 pcl::PCLPointCloud2
 proto_to_pcl2(std::shared_ptr<upns::PCLPointCloud2_empty> msg_pc)
