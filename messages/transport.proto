@@ -9,3 +9,7 @@ message Header {
   uint32 COMP_ID  = 1;
   uint32 MSG_TYPE = 2;
 }
+
+message RawDataSize {
+  uint32 size  = 1;
+}

@@ -20,7 +20,7 @@ message Tree {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1;
-    MSG_TYPE = 1; 
+    MSG_TYPE = 2;
   }
     map<string, ObjectReference> refs = 2;
 }
@@ -32,7 +32,7 @@ message ObjectReference {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1;
-    MSG_TYPE = 2;
+    MSG_TYPE = 3;
   }
     string id = 1; // another tree, or entity. TODO: Remove member "layers" from map and "entities" from layer.
     int64 lastChange = 2; // unix time
@@ -121,12 +121,11 @@ message Entity {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1;
-    MSG_TYPE = 3;
+    MSG_TYPE = 4;
   }
   string dataId = 1; // Hash of the complete entity data stream
   LayerType type = 3;
   LayerUsageType usageType = 4;
-  TransformRef transform = 5;
 }
 
 message Transform {

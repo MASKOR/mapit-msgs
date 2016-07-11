@@ -23,3 +23,12 @@ message Region {
 }
 **/
 
+message RequestLayer {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 1;
+    MSG_TYPE = 2;
+  }
+  string commitId = 1;
+
+}
