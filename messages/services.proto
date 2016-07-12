@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "datastructs.proto";
+
 package upns;
 
 /**
