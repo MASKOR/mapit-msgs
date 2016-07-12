@@ -23,12 +23,100 @@ message Region {
 }
 **/
 
-message RequestLayer {
+message RequestCheckoutFromMaster {
   enum CompType {
     PROTO_3  = 0;
-    COMP_ID  = 1;
-    MSG_TYPE = 2;
+    COMP_ID  = 20;
+    MSG_TYPE = 01;
   }
-  string commitId = 1;
 
+  string checkout = 1;
+}
+
+message ReplyCheckoutFromMaster {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 01;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    EXISTED = 1;
+  }
+  Status status = 1;
+}
+
+message RequestListCheckouts {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 02;
+  }
+}
+
+message ReplyListCheckouts {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 02;
+  }
+
+  repeated string checkouts = 1;
+}
+
+message RequestHierarchy {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 03;
+  }
+
+  string checkout = 1;
+//  string hierarchy = 2;
+}
+
+message ReplyHierarchyLayer {
+  //  name,   type
+  map<string, LayerType> enteties = 1;
+}
+
+message ReplyHierarchyMap {
+  map<string, ReplyHierarchyLayer> layers = 1;
+}
+
+message ReplyHierarchy {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 03;
+  }
+
+  map<string, ReplyHierarchyMap> maps = 1;
+}
+
+message RequestEntitydata {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 04;
+  }
+
+  string checkout = 1;
+  string entitypath = 2;
+}
+
+message ReplyEntitydata {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 04;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    NOT_FOUND = 404;
+  }
+
+  Status status = 1;
 }
