@@ -80,7 +80,7 @@ message RequestHierarchy {
 
 message ReplyHierarchyLayer {
   //  name,   type
-  map<string, LayerType> enteties = 1;
+  map<string, LayerType> entities = 1;
 }
 
 message ReplyHierarchyMap {
@@ -118,6 +118,56 @@ message ReplyEntitydata {
   enum Status {
     SUCCESS = 0;
     NOT_FOUND = 404;
+  }
+
+  Status status = 1;
+}
+
+message RequestOperatorExecution {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 101;
+  }
+
+  string checkout = 1;
+  OperationDescription param = 2;
+}
+
+message ReplyOperatorExecution {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 101;
+  }
+
+  int32 error_code = 1; // operator specific error code (0 is ok)
+  string error_msg = 2; // human readable error code (optional)
+  ReplyHierarchy changed_entities = 3;
+}
+
+message RequestStoreEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 102;
+  }
+
+  string checkout = 1;
+  string path = 2;
+  LayerType type = 3;
+}
+
+message ReplyStoreEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 102;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    ALREADY_EXISTED = 1;
   }
 
   Status status = 1;
