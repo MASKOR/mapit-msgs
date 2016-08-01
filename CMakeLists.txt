@@ -18,44 +18,42 @@ set(PROTOBUF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(UPNS_INTERFACE_INCLUDE ${PROTOBUF_OUTPUT_DIR})
 
-#find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
-
 ######## Protobuf + gRpc
-#protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-#use_grpc()
-use_protobuf()
+protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
 
-foreach(FIL ${ProtoFiles})
-    get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
-    get_filename_component(FIL_WE ${FIL} NAME_WE)
+#foreach(FIL ${ProtoFiles})
+#    get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+#    get_filename_component(FIL_WE ${FIL} NAME_WE)
+##    add_custom_command(
+##        OUTPUT "${FIL_WE}.grpc.pb.cc"
+##             "${FIL_WE}.grpc.pb.h"
+##        COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+##        ARGS --grpc_out=${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} ${ABS_FIL}
+##        DEPENDS ${ABS_FIL}
+##        COMMENT "Running grpc protocol buffer compiler on ${FIL}"
+##        VERBATIM )
+
 #    add_custom_command(
-#        OUTPUT "${FIL_WE}.grpc.pb.cc"
-#             "${FIL_WE}.grpc.pb.h"
+#        OUTPUT "${FIL_WE}.pb.cc"
+#               "${FIL_WE}.pb.h"
 #        COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-#        ARGS --grpc_out=${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} ${ABS_FIL}
+#        ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
 #        DEPENDS ${ABS_FIL}
-#        COMMENT "Running grpc protocol buffer compiler on ${FIL}"
+#        COMMENT "Running C++ protocol buffer compiler on ${FIL}"
 #        VERBATIM )
 
-    add_custom_command(
-        OUTPUT "${FIL_WE}.pb.cc"
-               "${FIL_WE}.pb.h"
-        COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-        ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
-        DEPENDS ${ABS_FIL}
-        COMMENT "Running C++ protocol buffer compiler on ${FIL}"
-        VERBATIM )
 
+##    list(APPEND MESSAGES_SRCS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.grpc.pb.cc")
+##    list(APPEND MESSAGES_HDRS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.grpc.pb.h")
 
-#    list(APPEND MESSAGES_SRCS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.grpc.pb.cc")
-#    list(APPEND MESSAGES_HDRS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.grpc.pb.h")
+#    list(APPEND MESSAGES_SRCS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.cc")
+#    list(APPEND MESSAGES_HDRS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.h")
 
-    list(APPEND MESSAGES_SRCS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.cc")
-    list(APPEND MESSAGES_HDRS "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.h")
-
-endforeach()
+#endforeach()
 
 set_source_files_properties(${MESSAGES_SRCS} ${MESSAGES_HDRS} PROPERTIES GENERATED TRUE)
 #set(MESSAGES_SRCS ${MESSAGES_SRCS} PARENT_SCOPE)
