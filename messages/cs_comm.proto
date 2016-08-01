@@ -1,0 +1,116 @@
+
+/***************************************************************************
+ *  OrderInstruction.proto - LLSF Protocol - Order Instruction message
+ *
+ *  Created: Mon Feb 25 11:37:09 2013
+ *  Copyright  2013  Tim Niemueller [www.niemueller.de]
+ *             2016  Tobias Neumann
+ ****************************************************************************/
+
+/*  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in
+ *   the documentation and/or other materials provided with the
+ *   distribution.
+ * - Neither the name of the authors nor the names of its contributors
+ *   may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+syntax = "proto3";
+
+package upns;
+
+message Request {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 1000;
+    MSG_TYPE = 01;
+  }
+
+  enum Type {
+    TEXT_OUTPUT = 0;
+    POINTCLOUD = 1;
+  }
+
+  string   sender_name = 1;
+  Type     type = 2;
+}
+
+message PCLPointCloud2_empty {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 3000;
+    MSG_TYPE = 01;
+  }
+  PCLHeader     header       = 1;
+  uint32        height       = 2;
+  uint32        width        = 3;
+  repeated PCLPointField fields       = 4;
+  uint32        is_bigendian = 5;
+  uint32        point_step   = 6;
+  uint32        row_step     = 7;
+  bool          is_dense     = 9;
+}
+
+message PCLHeader {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 2000;
+    MSG_TYPE = 01;
+  }
+
+  uint32 seq      = 1;
+  uint64 stamp    = 2;
+  string frame_id = 3;
+}
+
+message PCLPointField {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 2000;
+    MSG_TYPE = 02;
+  }
+
+  string name     = 1;
+  uint32 offset   = 2;
+  uint32 datatype = 3;
+  uint32 count    = 4;
+}
+
+message PCLPointCloud2 {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 2000;
+    MSG_TYPE = 03;
+  }
+
+  PCLHeader     header       = 1;
+  uint32        height       = 2;
+  uint32        width        = 3;
+  repeated PCLPointField fields       = 4;
+  uint32        is_bigendian = 5;
+  uint32        point_step   = 6;
+  uint32        row_step     = 7;
+  bytes         data         = 8;
+  bool          is_dense     = 9;
+
+}
+

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package upns;
+
+/**
+ * this message can not be send, it is used internaly for message identification
+ */
+message Header {
+  uint32 COMP_ID  = 1;
+  uint32 MSG_TYPE = 2;
+}
+
+message RawDataSize {
+  uint32 size  = 1;
+}
