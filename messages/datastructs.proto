@@ -96,11 +96,12 @@ message GenericEntry
  */
 enum LayerType {
   NONE = 0;
-  POINTCLOUD2 = 1;
-  OCTOMAP = 2;
-  OPENVDB = 3;
-  POSES = 4;
-  LAST_PREDEFINED = 5;
+  ANY_RAW = 1;
+  POINTCLOUD2 = 4;
+  OCTOMAP = 5;
+  OPENVDB = 6;
+  POSES = 7;
+  LAST_PREDEFINED = 8;
 }
 enum LayerUsageType {
   LASER = 0;

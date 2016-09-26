@@ -25,7 +25,7 @@ message Region {
 }
 **/
 
-message RequestCheckoutFromMaster {
+message RequestCheckout {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 20;
@@ -33,9 +33,10 @@ message RequestCheckoutFromMaster {
   }
 
   string checkout = 1;
+  string commit = 2;
 }
 
-message ReplyCheckoutFromMaster {
+message ReplyCheckout {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 21;
@@ -45,6 +46,7 @@ message ReplyCheckoutFromMaster {
   enum Status {
     SUCCESS = 0;
     EXISTED = 1;
+    ERROR = 2;
   }
   Status status = 1;
 }
