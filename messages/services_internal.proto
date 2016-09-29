@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+import "datastructs.proto";
+
+package upns;
+
+message RequestEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 30;
+    MSG_TYPE = 01;
+  }
+
+  string checkout = 1;
+  string path = 2;
+}
+
+message ReplyEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 31;
+    MSG_TYPE = 01;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    NOT_FOUND = 404;
+  }
+
+  Status status = 1;
+  Entity entity = 2;
+}
+
+message RequestTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 30;
+    MSG_TYPE = 02;
+  }
+
+  string checkout = 1;
+  string path = 2;
+}
+
+message ReplyTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 31;
+    MSG_TYPE = 02;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    NOT_FOUND = 404;
+  }
+
+  Status status = 1;
+  Tree tree = 2;
+}

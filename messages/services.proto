@@ -4,6 +4,9 @@ import "datastructs.proto";
 
 package upns;
 
+// COMP_ID:  20 for Requests, 21 for Replies.
+// MSG_TYPE: same for req/rep-pairs. >100 indicates writing access to the server.
+
 /**
 message Region {
   int64 layerId = 1;
@@ -108,6 +111,9 @@ message RequestEntitydata {
 
   string checkout = 1;
   string entitypath = 2;
+  // transmit large datasets piecewise
+  uint64 offset = 3;
+  uint64 maxlength = 4; // must fit into the servers and clients ram (e.g. 2gb maximum).
 }
 
 message ReplyEntitydata {
@@ -121,8 +127,8 @@ message ReplyEntitydata {
     SUCCESS = 0;
     NOT_FOUND = 404;
   }
-
   Status status = 1;
+  uint64 length = 2;
 }
 
 message RequestOperatorExecution {
