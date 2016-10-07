@@ -57,3 +57,29 @@ message ReplyTree {
   Status status = 1;
   Tree tree = 2;
 }
+
+message RequestStoreTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 30;
+    MSG_TYPE = 101;
+  }
+
+  string checkout = 1;
+  string path = 2;
+}
+
+message ReplyStoreTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 31;
+    MSG_TYPE = 101;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    EXISTED = 1;
+  }
+
+  Status status = 1;
+}

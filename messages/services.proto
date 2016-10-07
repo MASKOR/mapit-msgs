@@ -113,7 +113,7 @@ message RequestEntitydata {
   string entitypath = 2;
   // transmit large datasets piecewise
   uint64 offset = 3;
-  uint64 maxlength = 4; // must fit into the servers and clients ram (e.g. 2gb maximum).
+  uint64 maxlength = 4; // must fit into the servers and clients ram (e.g. 2gb maximum). Maybe even twice (*needs validation)
 }
 
 message ReplyEntitydata {
@@ -125,10 +125,12 @@ message ReplyEntitydata {
 
   enum Status {
     SUCCESS = 0;
+    EXCEEDED_BOUNDARY = 1;
     NOT_FOUND = 404;
   }
   Status status = 1;
-  uint64 length = 2;
+  uint64 receivedlength = 2;
+  uint64 entitylength = 3;
 }
 
 message RequestOperatorExecution {
@@ -149,11 +151,16 @@ message ReplyOperatorExecution {
     MSG_TYPE = 101;
   }
 
-  int32 error_code = 1; // operator specific error code (0 is ok)
+  int32 status_code = 1; // operator specific error code (0 is ok)
   string error_msg = 2; // human readable error code (optional)
-  ReplyHierarchy changed_entities = 3;
+  //ReplyHierarchy changed_entities = 3;
+  OperationDescription result = 4;
 }
 
+// Note: This message is used as header for a binary raw message.
+// If something with the header is wrong, all the sent data may be discarded.
+// If the message does not fit into the servers RAM at once, the message is discarded.
+// To handle this raw data can be split into multiple smaller pieces by using offset/sendlength/entitylength
 message RequestStoreEntity {
   enum CompType {
     PROTO_3  = 0;
@@ -164,6 +171,11 @@ message RequestStoreEntity {
   string checkout = 1;
   string path = 2;
   LayerType type = 3;
+
+  // transmit large datasets piecewise
+  uint64 offset = 4;
+  uint64 sendlength = 5; // must fit into the servers and clients ram (e.g. 2gb maximum). Maybe even twice (*needs validation)
+  uint64 entitylength = 6; // must be at least sendlength.
 }
 
 message ReplyStoreEntity {
@@ -175,7 +187,7 @@ message ReplyStoreEntity {
 
   enum Status {
     SUCCESS = 0;
-    ALREADY_EXISTED = 1;
+    ERROR = 1;
   }
 
   Status status = 1;
