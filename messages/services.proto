@@ -113,9 +113,10 @@ message RequestEntitydata {
   string entitypath = 2;
   // transmit large datasets piecewise
   uint64 offset = 3;
-  uint64 maxlength = 4; // must fit into the servers and clients ram (e.g. 2gb maximum). Maybe even twice (*needs validation)
+  // must fit into the servers and clients ram (e.g. 2gb maximum). Maybe even twice (*needs validation)
+  // zero is treated as zero. server returns an header without raw data if maxlength is zero.
+  uint64 maxlength = 4;
 }
-
 message ReplyEntitydata {
   enum CompType {
     PROTO_3  = 0;
