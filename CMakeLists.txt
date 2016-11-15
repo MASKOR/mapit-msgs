@@ -8,12 +8,13 @@ set(PROTOBUF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 ######## Protobuf
 find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
+include_directories(${Protobuf_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # If you get errors with protobuf in this cmake, try the official way by uncommenting the next line starting with protobuf_...
 # TODO: results in /bin/sh: --cpp_out: Kommando nicht gefunden.
-# protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
+# TODO: Does not automatically find Protobuf_PROTOC_EXECUTABLE (Case is important).
+#protobuf_generate_cpp(MESSAGES_SRCS MESSAGES_HDRS ${ProtoFiles})
 
 # As a workaround this does the trick and generated protobuf message headers
 
@@ -39,7 +40,7 @@ set_source_files_properties(${MESSAGES_SRCS} ${MESSAGES_HDRS} PROPERTIES GENERAT
 
 ########
 
-#Note: On Win32 this can not be a 'shared' library as it would create a dll without any exported symbols! Thus, make it a static linked library
+#Note: On Win32 this can not be a 'shared' library as it would create a dll without any exported symbol! Thus, make it a static linked library
 add_library(${PROJECT_NAME} ${MESSAGES_SRCS} ${MESSAGES_HDRS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
