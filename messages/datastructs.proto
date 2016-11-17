@@ -97,10 +97,10 @@ message GenericEntry
 enum LayerType {
   NONE = 0;
   ANY_RAW = 1;
-  POINTCLOUD2 = 4;
+  POINTCLOUD = 4;
   OCTOMAP = 5;
   OPENVDB = 6;
-  POSES = 7;
+  TF = 7;
   BOUNDINGBOX = 8;
   LAST_PREDEFINED = 32;
 }
