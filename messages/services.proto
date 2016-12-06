@@ -35,8 +35,11 @@ message RequestCheckout {
     MSG_TYPE = 01;
   }
 
-  string checkout = 1;
-  string commit = 2;
+  string checkout = 1; // Checkout name
+  repeated string commit = 2; // commit id to create a new checkout from (if it does not exist). Multiple for merge.
+  // createIfNotExists: false: only check if this checkout exists.
+  //                    true: create the checkout, if it did not exist. Returns the existing checkout otherwise
+  bool   createIfNotExists = 3;
 }
 
 message ReplyCheckout {
@@ -52,6 +55,7 @@ message ReplyCheckout {
     ERROR = 2;
   }
   Status status = 1;
+  repeated string commit = 2; // commit ids the current checkout is based on
 }
 
 message RequestListCheckouts {
