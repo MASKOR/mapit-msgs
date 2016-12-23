@@ -26,8 +26,8 @@ message Tree {
 }
 
 //// TODO: Entity may be ObjectReference
-//// ids may have the form <checkoutname>_path for objects with rehashing pending.
-//// when changing objects this id must not change
+//// id or path: only exactly one of them must be set. id xor path.
+//// path is [/]<checkoutname>/[<tree>/.../<entity>]
 message ObjectReference {
   enum CompType {
     PROTO_3  = 0;
@@ -35,8 +35,9 @@ message ObjectReference {
     MSG_TYPE = 3;
   }
     string id = 1; // another tree, or entity. TODO: Remove member "layers" from map and "entities" from layer.
-    int64 lastChange = 2; // unix time
-    string meta = 3;
+    string path = 2;
+    //int64 lastChange = 3; // unix time
+    //string meta = 4;
 }
 
 // Not a good idea as it would be possible to build a hierarchy of objects in one object
@@ -238,7 +239,7 @@ message Commit {
     repeated ObjectIdList detailedTransitions = 7;
 
     // Entrypoint to Tree with children hierarchy: root-> maps -> layers -> entities
-    string root = 8;
+    ObjectReference root = 8;
 }
 
 message Conflict {
