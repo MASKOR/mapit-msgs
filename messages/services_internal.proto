@@ -4,7 +4,8 @@ import "datastructs.proto";
 
 package upns;
 
-message RequestEntity {
+//TODO: should be public
+message RequestGenericEntry {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 30;
@@ -15,7 +16,8 @@ message RequestEntity {
   string path = 2;
 }
 
-message ReplyEntity {
+//TODO: should be public
+message ReplyGenericEntry {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 31;
@@ -28,36 +30,10 @@ message ReplyEntity {
   }
 
   Status status = 1;
-  Entity entity = 2;
+  GenericEntry entry = 2;
 }
 
-message RequestTree {
-  enum CompType {
-    PROTO_3  = 0;
-    COMP_ID  = 30;
-    MSG_TYPE = 02;
-  }
-
-  string checkout = 1;
-  string path = 2;
-}
-
-message ReplyTree {
-  enum CompType {
-    PROTO_3  = 0;
-    COMP_ID  = 31;
-    MSG_TYPE = 02;
-  }
-
-  enum Status {
-    SUCCESS = 0;
-    NOT_FOUND = 404;
-  }
-
-  Status status = 1;
-  Tree tree = 2;
-}
-
+//TODO: should be public
 message RequestStoreTree {
   enum CompType {
     PROTO_3  = 0;
@@ -69,6 +45,7 @@ message RequestStoreTree {
   string path = 2;
 }
 
+//TODO: should be public
 message ReplyStoreTree {
   enum CompType {
     PROTO_3  = 0;
@@ -79,7 +56,90 @@ message ReplyStoreTree {
   enum Status {
     SUCCESS = 0;
     EXISTED = 1;
+    CHECKOUT_NOT_FOUND = 2;
+    ERROR = 3;
   }
 
   Status status = 1;
 }
+
+// Sends a url to the server for requests of data it does not have locally.
+// E.g. Remote should compute voxelgrid_filter of /test/test/bunny which it does not have. It then would request this url.
+message RequestSendLocalServerUrl {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 30;
+    MSG_TYPE = 201;
+  }
+
+  string url = 1;
+}
+
+message ReplySendLocalServerUrl {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 31;
+    MSG_TYPE = 201;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    ERROR = 3;
+  }
+
+  Status status = 1;
+}
+
+//message RequestEntity {
+//  enum CompType {
+//    PROTO_3  = 0;
+//    COMP_ID  = 30;
+//    MSG_TYPE = 02;
+//  }
+
+//  string checkout = 1;
+//  string path = 2;
+//}
+
+//message ReplyEntity {
+//  enum CompType {
+//    PROTO_3  = 0;
+//    COMP_ID  = 31;
+//    MSG_TYPE = 02;
+//  }
+
+//  enum Status {
+//    SUCCESS = 0;
+//    NOT_FOUND = 404;
+//  }
+
+//  Status status = 1;
+//  Entity entity = 2;
+//}
+
+//message RequestTree {
+//  enum CompType {
+//    PROTO_3  = 0;
+//    COMP_ID  = 30;
+//    MSG_TYPE = 03;
+//  }
+
+//  string checkout = 1;
+//  string path = 2;
+//}
+
+//message ReplyTree {
+//  enum CompType {
+//    PROTO_3  = 0;
+//    COMP_ID  = 31;
+//    MSG_TYPE = 03;
+//  }
+
+//  enum Status {
+//    SUCCESS = 0;
+//    NOT_FOUND = 404;
+//  }
+
+//  Status status = 1;
+//  Tree tree = 2;
+//}
