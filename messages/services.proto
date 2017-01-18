@@ -121,6 +121,7 @@ message RequestEntitydata {
   // zero is treated as zero. server returns an header without raw data if maxlength is zero.
   uint64 maxlength = 4;
 }
+
 message ReplyEntitydata {
   enum CompType {
     PROTO_3  = 0;
@@ -137,6 +138,7 @@ message ReplyEntitydata {
   uint64 receivedlength = 2;
   uint64 entitylength = 3;
 }
+
 
 message RequestOperatorExecution {
   enum CompType {

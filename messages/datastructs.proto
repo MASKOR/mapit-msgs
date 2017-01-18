@@ -103,6 +103,7 @@ enum LayerType {
   OPENVDB = 6;
   TF = 7;
   BOUNDINGBOX = 8;
+  ASSET = 9;
   LAST_PREDEFINED = 32;
 }
 enum LayerUsageType {
