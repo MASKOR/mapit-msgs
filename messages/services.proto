@@ -76,6 +76,34 @@ message ReplyListCheckouts {
   repeated string checkouts = 1;
 }
 
+message RequestHierarchyPlain {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 993;
+  }
+
+  string checkout = 1;
+  string entrypoint = 2;
+}
+
+message ReplyHierarchyPlain {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 993;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    CHECKOUT_NOT_FOUND = 1;
+    NOT_FOUND = 404;
+  }
+  Status status = 1;
+
+  repeated string entities = 2;
+}
+
 message RequestHierarchy {
   enum CompType {
     PROTO_3  = 0;
