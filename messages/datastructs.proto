@@ -128,7 +128,8 @@ message Entity {
     MSG_TYPE = 4;
   }
   string dataId = 1; // Hash of the complete entity data stream
-  LayerType type = 3;
+  //LayerType type = 3;
+  string type = 3;
   LayerUsageType usageType = 4;
 }
 
