@@ -205,7 +205,7 @@ message RequestStoreEntity {
 
   string checkout = 1;
   string path = 2;
-  LayerType type = 3;
+  string type = 3;
 
   // transmit large datasets piecewise
   uint64 offset = 4;
