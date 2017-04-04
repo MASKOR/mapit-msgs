@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "datastructs.proto";
 
-package upns;
+package mapit.msgs;
 
 //TODO: should be public
 message RequestGenericEntry {

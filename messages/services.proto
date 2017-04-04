@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "datastructs.proto";
 
-package upns;
+package mapit.msgs;
 
 // COMP_ID:  20 for Requests, 21 for Replies.
 // MSG_TYPE: same for req/rep-pairs. >100 indicates writing access to the server.

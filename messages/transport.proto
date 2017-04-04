@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package upns;
+package mapit.msgs;
 
 /**
  * this message can not be send, it is used internaly for message identification
