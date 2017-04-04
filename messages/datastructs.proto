@@ -258,6 +258,15 @@ message Conflict {
 //    int64 id = 1;
 //    string commitId = 2;
 //}
+message OperatorDescription {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 1;
+    MSG_TYPE = 15;
+  }
+    string operatorName = 1;
+    int32 operatorVersion = 2;
+}
 
 message OperationDescription {
   enum CompType {
@@ -265,45 +274,9 @@ message OperationDescription {
     COMP_ID  = 1;
     MSG_TYPE = 11;
   }
-    string operatorName = 1;
-    int32 operatorVersion = 2;
+    OperatorDescription operator = 1;
     string params = 3;
-    //repeated OperationParameter params = 3;
 }
-
-//message OperationParameter {
-//    string                        key = 1;
-
-//    //optional, set one of these three
-//    int64                         intval = 2;
-//    double                        realval = 3;
-//    string                        strval = 4;
-//    //string                        transformval = 5; //< is in object
-
-//    string objectId = 5;
-
-//    //... or set 1) map; 2) map and layer; 3) map, layer and entity
-//    int64      entityval = 7; //deprecated
-//    int64       layerval = 8; //deprecated
-//    int64         mapval = 9; //deprecated
-//}
-
-//message OperationParameterEntity {
-//    int64 mapId = 1;
-//    int64 layerId = 2;
-//    int64 entityId = 3;
-//}
-//message OperationParameterLayer {
-//    int64 mapId = 1;
-//    int64 layerId = 2;
-//}
-//message OperationParameterMap {
-//    int64 mapId = 1;
-//}
-
-//message OperationParameterTransform {
-//    int64 tfId = 1;
-//}
 
 //temporary use prototype for pointcloud2
 message Pointcloud2Header {
