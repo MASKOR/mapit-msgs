@@ -127,38 +127,42 @@ message Entity {
     COMP_ID  = 1;
     MSG_TYPE = 4;
   }
-  string dataId = 1; // Hash of the complete entity data stream
+  Time stamp      = 1;
+  string frame_id = 2;
+
+  string dataId = 3; // Hash of the complete entity data stream
   //LayerType type = 3;
-  string type = 3;
-  LayerUsageType usageType = 4;
+  string type = 4;
+  LayerUsageType usageType = 5;
+}
+message Time {
+  uint32 sec = 1;
+  uint32 nsec = 2;
+}
+
+message Vector {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Quaternion {
+  float w = 4;
+  float x = 1;
+  float y = 2;
+  float z = 3;
 }
 
 message Transform {
-    enum CompType {
-        PROTO_3  = 0;
-        COMP_ID  = 1;
-        MSG_TYPE = 5;
-    }
-    float m00 = 1; // scale x
-    float m01 = 2;
-    float m02 = 3;
-    float m03 = 4;
-    float m10 = 5;
-    float m11 = 6; // scale y
-    float m12 = 7;
-    float m13 = 8;
-    float m20 = 9;
-    float m21 = 10;
-    float m22 = 11;
-    float m23 = 12;
-    float m30 = 13; // x
-    float m31 = 14; // y
-    float m32 = 15; // z
-    float m33 = 16; // scale z
-    int64 id = 17;
-    int64 parentId = 18; // if parentId is 0, the transform is absolute and in the same coordinate system as the map's root transform
-    int64 timestamp = 19; // 32bit seconds and 32bit nanoseconds
-    repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 1;
+    MSG_TYPE = 5;
+  }
+  string child_frame_id  = 1;
+
+  Vector     translation = 2;
+  Quaternion rotation    = 3;
 }
 message TransformPath {
     enum CompType {
