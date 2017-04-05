@@ -1,5 +1,5 @@
 syntax = "proto3";
-package upns;
+package mapit.msgs;
 
 // TODO: The id field might be obsolete. Hash can always be generated.
 
