@@ -134,31 +134,31 @@ message Entity {
 }
 
 message Transform {
-  enum CompType {
-    PROTO_3  = 0;
-    COMP_ID  = 1;
-    MSG_TYPE = 5;
-  }
-  float m00 = 1; // scale x
-  float m01 = 2;
-  float m02 = 3;
-  float m03 = 4;
-  float m10 = 5;
-  float m11 = 6; // scale y
-  float m12 = 7;
-  float m13 = 8;
-  float m20 = 9;
-  float m21 = 10;
-  float m22 = 11;
-  float m23 = 12;
-  float m30 = 13; // x
-  float m31 = 14; // y
-  float m32 = 15; // z
-  float m33 = 16; // scale z
-  int64 id = 17;
-  int64 parentId = 18; // if parentId is 0, the transform is absolute and in the same coordinate system as the map's root transform
-  int64 timestamp = 19; // 32bit seconds and 32bit nanoseconds
-  repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
+    enum CompType {
+        PROTO_3  = 0;
+        COMP_ID  = 1;
+        MSG_TYPE = 5;
+    }
+    float m00 = 1; // scale x
+    float m01 = 2;
+    float m02 = 3;
+    float m03 = 4;
+    float m10 = 5;
+    float m11 = 6; // scale y
+    float m12 = 7;
+    float m13 = 8;
+    float m20 = 9;
+    float m21 = 10;
+    float m22 = 11;
+    float m23 = 12;
+    float m30 = 13; // x
+    float m31 = 14; // y
+    float m32 = 15; // z
+    float m33 = 16; // scale z
+    int64 id = 17;
+    int64 parentId = 18; // if parentId is 0, the transform is absolute and in the same coordinate system as the map's root transform
+    int64 timestamp = 19; // 32bit seconds and 32bit nanoseconds
+    repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
 }
 message TransformPath {
     enum CompType {
@@ -175,14 +175,14 @@ message Pose {
       COMP_ID  = 1;
       MSG_TYPE = 52;
     }
-  float x = 1;
-  float y = 2;
-  float z = 3;
-  float dir_x = 4;
-  float dir_y = 5;
-  float dir_z = 6;
-  int64 timestamp = 7; // 32bit seconds and 32bit nanoseconds
-  repeated string data = 8; // user data, additional
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float dir_x = 4;
+    float dir_y = 5;
+    float dir_z = 6;
+    int64 timestamp = 7; // 32bit seconds and 32bit nanoseconds
+    repeated string data = 8; // user data, additional
 }
 
 message PosePath {
@@ -192,6 +192,32 @@ message PosePath {
       MSG_TYPE = 53;
     }
     repeated Pose poses = 1;
+}
+
+message Primitive {
+    enum CompType {
+      PROTO_3  = 0;
+      COMP_ID  = 1;
+      MSG_TYPE = 60;
+    }
+    // All primitives are 1 unit in size and must be transformed to fit
+    enum PrimitiveType {
+      SPHERE  = 0;
+      CUBE  = 1;
+      PLANE = 2;
+      CYLINDER = 3;
+      CAPSULE = 4;
+      CONE = 5;
+      DISC = 6;
+      POINT = 7;
+      ARROW = 8;
+      LINE = 9;
+      TEXT = 10;
+      ICON = 11;
+    }
+    PrimitiveType type = 1;
+    string text = 2;
+    string data = 3;
 }
 
 message Boundingbox {
