@@ -160,6 +160,39 @@ message Transform {
   int64 timestamp = 19; // 32bit seconds and 32bit nanoseconds
   repeated string tags = 20; // can be used to do things like: find the first transform in hierarchy with tag "robot"
 }
+message TransformPath {
+    enum CompType {
+      PROTO_3  = 0;
+      COMP_ID  = 1;
+      MSG_TYPE = 51;
+    }
+    repeated Transform transforms = 1;
+}
+
+message Pose {
+    enum CompType {
+      PROTO_3  = 0;
+      COMP_ID  = 1;
+      MSG_TYPE = 52;
+    }
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float dir_x = 4;
+  float dir_y = 5;
+  float dir_z = 6;
+  int64 timestamp = 7; // 32bit seconds and 32bit nanoseconds
+  repeated string data = 8; // user data, additional
+}
+
+message PosePath {
+    enum CompType {
+      PROTO_3  = 0;
+      COMP_ID  = 1;
+      MSG_TYPE = 53;
+    }
+    repeated Pose poses = 1;
+}
 
 message Boundingbox {
   enum CompType {
