@@ -206,14 +206,15 @@ message Primitive {
       CUBE  = 1;
       PLANE = 2;
       CYLINDER = 3;
-      CAPSULE = 4;
-      CONE = 5;
-      DISC = 6;
-      POINT = 7;
-      ARROW = 8;
-      LINE = 9;
-      TEXT = 10;
-      ICON = 11;
+      CONE = 4;
+      CAPSULE = 5;
+      DONUT = 6;
+      DISC = 7;
+      POINT = 8;
+      ARROW = 9;
+      LINE = 10;
+      TEXT = 11;
+      ICON = 12;
     }
     PrimitiveType type = 1;
     string text = 2;
