@@ -2,9 +2,9 @@ project(upns_interface)
 cmake_minimum_required(VERSION 2.8.12) # target_include_directories
 aux_source_directory(. SRC_LIST)
 
-file(GLOB ProtoFiles ${PROJECT_SOURCE_DIR}/messages/*.proto)
+file(GLOB ProtoFiles messages/*.proto)
 
-set(PROTOBUF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${MAPIT_INSTALL_INCLUDE}/msgs)
+set(PROTOBUF_OUTPUT_DIR ${MAPIT_INSTALL_INCLUDE}/msgs)
 
 # create directory for headers
 file(MAKE_DIRECTORY ${PROTOBUF_OUTPUT_DIR})
@@ -12,7 +12,7 @@ file(MAKE_DIRECTORY ${PROTOBUF_OUTPUT_DIR})
 ######## Protobuf
 find_package(Protobuf REQUIRED)
 include_directories(${Protobuf_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # If you get errors with protobuf in this cmake, try the official way by uncommenting the next line starting with protobuf_...
 # Note: this will not output headers in the correct folder. Find a workaround...
@@ -26,13 +26,12 @@ foreach(FIL ${ProtoFiles})
     get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
     get_filename_component(FIL_WE ${FIL} NAME_WE)
 
-
     add_custom_command(
         OUTPUT "${MAPIT_INSTALL_INCLUDE}/msgs/${FIL_WE}.pb.cc"
                "${MAPIT_INSTALL_INCLUDE}/msgs/${FIL_WE}.pb.h"
         COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
         ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
-        DEPENDS ${ABS_FIL}
+        DEPENDS ${FIL}
         COMMENT "Running C++ protocol buffer compiler on ${FIL}"
         VERBATIM )
 
@@ -50,14 +49,68 @@ add_library(${PROJECT_NAME} ${MESSAGES_SRCS} ${MESSAGES_HDRS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
-# all projects depending on this will include CMAKE_CURRENT_BINARY_DIR
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# all projects depending on this will include PROTOBUF_OUTPUT_DIR
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_OUTPUT_DIR})
 
 # make proto visible in qtcreator
 file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/messages/*.proto)
 add_custom_target(${PROJECT_NAME}_ADDITIONAL_PROJECT_FILES ALL ${CMAKE_COMMAND} -E echo "Add proto files to project" SOURCES ${UPNS_PROTOFILES})
 
-file(GLOB_RECURSE UPNS_INTERFACE_PUBLIC_HEADER_FILES "${PROTOBUF_OUTPUT_DIR}/*.h")
+#file(GLOB_RECURSE UPNS_INTERFACE_PUBLIC_HEADER_FILES "${PROTOBUF_OUTPUT_DIR}/*.h")
 
-install(TARGETS ${PROJECT_NAME} DESTINATION lib/${CMAKE_LIBRARY_ARCHITECTURE})
-install(FILES ${UPNS_INTERFACE_PUBLIC_HEADER_FILES} DESTINATION include/${CMAKE_LIBRARY_ARCHITECTURE}/${MAPIT_INSTALL_INCLUDE}/msgs)
+#install(TARGETS ${PROJECT_NAME} DESTINATION lib/${CMAKE_LIBRARY_ARCHITECTURE})
+#install(FILES ${UPNS_INTERFACE_PUBLIC_HEADER_FILES} DESTINATION include/${CMAKE_LIBRARY_ARCHITECTURE}/${MAPIT_INSTALL_INCLUDE}/msgs)
+
+include(GenerateExportHeader)
+
+generate_export_header(${PROJECT_NAME})
+#set_property(TARGET ${PROJECT_NAME} PROPERTY VERSION ${MAPIT_VERSION})
+#set_property(TARGET ${PROJECT_NAME} PROPERTY SOVERSION ${MAPIT_VERSION})
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+  INTERFACE_mapit_MAJOR_VERSION ${MAPIT_MAJOR_VERSION})
+set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
+  COMPATIBLE_INTERFACE_STRING MAPIT_MAJOR_VERSION
+)
+
+install(TARGETS ${PROJECT_NAME} EXPORT upns_interface_targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+install(FILES "${PROTOBUF_OUTPUT_DIR}/*.h" DESTINATION "include/${MAPIT_INSTALL_INCLUDE}/msgs" )
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfigVersion.cmake"
+  VERSION 1
+  COMPATIBILITY AnyNewerVersion
+)
+
+export(EXPORT upns_interface_targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceTargets.cmake"
+  NAMESPACE mapit::
+)
+configure_file(cmake/mapitInterfaceConfig.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfig.cmake"
+  COPYONLY
+)
+
+set(ConfigPackageLocation lib/cmake/mapit)
+install(EXPORT upns_interface_targets
+  FILE
+    mapitInterfaceTargets.cmake
+  NAMESPACE
+    mapit::
+  DESTINATION
+    ${ConfigPackageLocation}
+)
+install(
+  FILES
+    cmake/mapitInterfaceConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfigVersion.cmake"
+  DESTINATION
+    ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)
