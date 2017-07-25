@@ -5,11 +5,15 @@
  
 # Compute paths
 #get_filename_component(MAPIT_INTERFACE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(MAPIT_INTERFACE_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
 #set(MAPIT_INTERFACE_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
- 
+
+include(CMakeFindDependencyMacro)
+find_dependency(Protobuf REQUIRED) 
+
 # Our library dependencies (contains definitions for IMPORTED targets)
-if(NOT TARGET upns_interface AND NOT upns_interface_BINARY_DIR)
-  include("${MAPIT_INTERFACE_CMAKE_DIR}/mapitInterfaceTargets.cmake")
+if(NOT TARGET mapit::interface AND NOT mapit::interface_BINARY_DIR)
+  include("${MAPIT_INTERFACE_CMAKE_DIR}/mapit_interfaceTargets.cmake")
 endif()
  
 # These are IMPORTED targets created by mapitInterfaceTargets.cmake

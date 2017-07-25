@@ -1,18 +1,17 @@
-project(upns_interface)
+project(interface)
 cmake_minimum_required(VERSION 2.8.12) # target_include_directories
 aux_source_directory(. SRC_LIST)
 
 file(GLOB ProtoFiles messages/*.proto)
-
-set(PROTOBUF_OUTPUT_DIR ${MAPIT_INSTALL_INCLUDE}/msgs)
+set(GENERATED_INCLUDE_INFIX generated/include)
+set(GENERATED_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${GENERATED_INCLUDE_INFIX})
+set(PROTOBUF_OUTPUT_DIR ${GENERATED_INCLUDE_DIR}/${MAPIT_INSTALL_INCLUDE}/msgs)
 
 # create directory for headers
 file(MAKE_DIRECTORY ${PROTOBUF_OUTPUT_DIR})
 
 ######## Protobuf
 find_package(Protobuf REQUIRED)
-include_directories(${Protobuf_INCLUDE_DIRS})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # If you get errors with protobuf in this cmake, try the official way by uncommenting the next line starting with protobuf_...
 # Note: this will not output headers in the correct folder. Find a workaround...
@@ -27,8 +26,8 @@ foreach(FIL ${ProtoFiles})
     get_filename_component(FIL_WE ${FIL} NAME_WE)
 
     add_custom_command(
-        OUTPUT "${MAPIT_INSTALL_INCLUDE}/msgs/${FIL_WE}.pb.cc"
-               "${MAPIT_INSTALL_INCLUDE}/msgs/${FIL_WE}.pb.h"
+        OUTPUT "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.cc"
+               "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.h"
         COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
         ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
         DEPENDS ${FIL}
@@ -50,7 +49,9 @@ target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
 # all projects depending on this will include PROTOBUF_OUTPUT_DIR
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_OUTPUT_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${GENERATED_INCLUDE_DIR}>
+                                                  $<INSTALL_INTERFACE:${MAPIT_INSTALL_INCLUDE}>
+                                                  ${Protobuf_INCLUDE_DIRS})
 
 # make proto visible in qtcreator
 file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/messages/*.proto)
@@ -67,7 +68,7 @@ generate_export_header(${PROJECT_NAME})
 #set_property(TARGET ${PROJECT_NAME} PROPERTY VERSION ${MAPIT_VERSION})
 #set_property(TARGET ${PROJECT_NAME} PROPERTY SOVERSION ${MAPIT_VERSION})
 set_property(TARGET ${PROJECT_NAME} PROPERTY
-  INTERFACE_mapit_MAJOR_VERSION ${MAPIT_MAJOR_VERSION})
+  INTERFACE_mapit_interface_MAJOR_VERSION ${MAPIT_MAJOR_VERSION})
 set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
   COMPATIBLE_INTERFACE_STRING MAPIT_MAJOR_VERSION
 )
@@ -78,28 +79,29 @@ install(TARGETS ${PROJECT_NAME} EXPORT upns_interface_targets
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
 )
-install(FILES "${PROTOBUF_OUTPUT_DIR}/*.h" DESTINATION "include/${MAPIT_INSTALL_INCLUDE}/msgs" )
+install(FILES ${MESSAGES_HDRS} DESTINATION "include/${MAPIT_INSTALL_INCLUDE}/msgs" )
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceConfigVersion.cmake"
   VERSION 1
   COMPATIBILITY AnyNewerVersion
 )
 
 export(EXPORT upns_interface_targets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceTargets.cmake"
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceTargets.cmake"
   NAMESPACE mapit::
 )
+
 configure_file(cmake/mapitInterfaceConfig.cmake
-  "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceConfig.cmake"
   COPYONLY
 )
 
 set(ConfigPackageLocation lib/cmake/mapit)
 install(EXPORT upns_interface_targets
   FILE
-    mapitInterfaceTargets.cmake
+    interfaceTargets.cmake
   NAMESPACE
     mapit::
   DESTINATION
@@ -108,7 +110,7 @@ install(EXPORT upns_interface_targets
 install(
   FILES
     cmake/mapitInterfaceConfig.cmake
-    "${CMAKE_CURRENT_BINARY_DIR}/mapit/mapitInterfaceConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceConfigVersion.cmake"
   DESTINATION
     ${ConfigPackageLocation}
   COMPONENT
