@@ -49,8 +49,8 @@ target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 
 # all projects depending on this will include PROTOBUF_OUTPUT_DIR
-target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${GENERATED_INCLUDE_DIR}>
-                                                  $<INSTALL_INTERFACE:${MAPIT_INSTALL_INCLUDE}>
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                                  $<INSTALL_INTERFACE:include>
                                                   ${Protobuf_INCLUDE_DIRS})
 
 # make proto visible in qtcreator
