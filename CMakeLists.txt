@@ -93,7 +93,7 @@ export(EXPORT upns_interface_targets
   NAMESPACE mapit::
 )
 
-configure_file(cmake/mapitInterfaceConfig.cmake
+configure_file(cmake/mapit_interfaceConfig.cmake
   "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceConfig.cmake"
   COPYONLY
 )
@@ -101,7 +101,7 @@ configure_file(cmake/mapitInterfaceConfig.cmake
 set(ConfigPackageLocation lib/cmake/mapit)
 install(EXPORT upns_interface_targets
   FILE
-    interfaceTargets.cmake
+    mapit_interfaceTargets.cmake
   NAMESPACE
     mapit::
   DESTINATION
@@ -109,7 +109,7 @@ install(EXPORT upns_interface_targets
 )
 install(
   FILES
-    cmake/mapitInterfaceConfig.cmake
+    cmake/mapit_interfaceConfig.cmake
     "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceConfigVersion.cmake"
   DESTINATION
     ${ConfigPackageLocation}
