@@ -11,7 +11,7 @@ set(PROTOBUF_OUTPUT_DIR ${GENERATED_INCLUDE_DIR}/${MAPIT_INSTALL_INCLUDE}/msgs)
 file(MAKE_DIRECTORY ${PROTOBUF_OUTPUT_DIR})
 
 ######## Protobuf
-find_package(Protobuf REQUIRED)
+find_package(Protobuf QUIET REQUIRED)
 
 # If you get errors with protobuf in this cmake, try the official way by uncommenting the next line starting with protobuf_...
 # Note: this will not output headers in the correct folder. Find a workaround...
