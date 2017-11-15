@@ -154,16 +154,28 @@ message Quaternion {
 }
 
 message Transform {
+  Vector     translation = 2;
+  Quaternion rotation    = 3;
+}
+
+message TransformWithTime {
+  Time stamp      = 1;
+  Transform transform = 3;
+}
+
+message TransformStampedList {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1;
     MSG_TYPE = 5;
   }
-  string child_frame_id  = 1;
+  string frame_id = 1;
+  string child_frame_id  = 2;
 
-  Vector     translation = 2;
-  Quaternion rotation    = 3;
+  repeated TransformWithTime transforms = 3;
+
 }
+
 message TransformPath {
     enum CompType {
       PROTO_3  = 0;
