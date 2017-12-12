@@ -26,7 +26,9 @@ message Tree {
 }
 
 //// TODO: Entity may be ObjectReference
+//// this builds up the tree structure. Tree has a list of references.
 //// id or path: only exactly one of them must be set. id xor path.
+//// id is the hash of an object after it was commited
 //// path is [/]<checkoutname>/[<tree>/.../<entity>]
 message ObjectReference {
   enum CompType {
@@ -34,8 +36,8 @@ message ObjectReference {
     COMP_ID  = 1;
     MSG_TYPE = 3;
   }
-    string id = 1; // another tree, or entity. TODO: Remove member "layers" from map and "entities" from layer.
-    string path = 2;
+    string id = 1; // a hash of a tree, or entity.
+    string path = 2; // a path to a tree or entity.
     //int64 lastChange = 3; // unix time
     //string meta = 4;
 }
@@ -225,7 +227,7 @@ message Primitive {
       CYLINDER = 3;
       CONE = 4;
       CAPSULE = 5;
-      DONUT = 6;
+      TORUS = 6;
       DISC = 7;
       POINT = 8;
       ARROW = 9;
