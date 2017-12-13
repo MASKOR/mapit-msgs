@@ -171,6 +171,7 @@ message TransformStampedList {
   }
   string frame_id = 1;
   string child_frame_id  = 2;
+  bool is_static = 4;
 
   repeated TransformWithTime transforms = 3;
 
