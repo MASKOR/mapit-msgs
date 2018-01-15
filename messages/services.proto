@@ -227,3 +227,55 @@ message ReplyStoreEntity {
 
   Status status = 1;
 }
+
+message RequestDeleteEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 103;
+  }
+
+  string checkout = 1;
+  string path = 2;
+}
+
+message ReplyDeleteEntity {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 103;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    ERROR = 1;
+  }
+
+  Status status = 1;
+}
+
+message RequestDeleteTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 105;
+  }
+
+  string checkout = 1;
+  string path = 2;
+}
+
+message ReplyDeleteTree {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 105;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    ERROR = 1;
+  }
+
+  Status status = 1;
+}
