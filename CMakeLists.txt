@@ -2,7 +2,7 @@ project(interface)
 cmake_minimum_required(VERSION 2.8.12) # target_include_directories
 aux_source_directory(. SRC_LIST)
 
-file(GLOB ProtoFiles messages/*.proto)
+file(GLOB ProtoFiles *.proto)
 set(GENERATED_INCLUDE_INFIX generated/include)
 set(GENERATED_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${GENERATED_INCLUDE_INFIX})
 set(PROTOBUF_OUTPUT_DIR ${GENERATED_INCLUDE_DIR}/${MAPIT_INSTALL_INCLUDE}/msgs)
@@ -29,7 +29,7 @@ foreach(FIL ${ProtoFiles})
         OUTPUT "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.cc"
                "${PROTOBUF_OUTPUT_DIR}/${FIL_WE}.pb.h"
         COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-        ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/messages ${ABS_FIL}
+        ARGS --cpp_out ${PROTOBUF_OUTPUT_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
         DEPENDS ${FIL}
         COMMENT "Running C++ protocol buffer compiler on ${FIL}"
         VERBATIM )
@@ -54,7 +54,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${GENERATED_
                                                   ${Protobuf_INCLUDE_DIRS})
 
 # make proto visible in qtcreator
-file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/messages/*.proto)
+file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/*.proto)
 add_custom_target(${PROJECT_NAME}_ADDITIONAL_PROJECT_FILES ALL ${CMAKE_COMMAND} -E echo "Add proto files to project" SOURCES ${UPNS_PROTOFILES})
 
 #file(GLOB_RECURSE UPNS_INTERFACE_PUBLIC_HEADER_FILES "${PROTOBUF_OUTPUT_DIR}/*.h")
