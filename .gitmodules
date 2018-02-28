@@ -1,3 +1,0 @@
-[submodule "comm_example/libs/protobuf_comm"]
-	path = comm_example/libs/protobuf_comm
-	url = https://github.com/robocup-industrial/protobuf_comm.git
