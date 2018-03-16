@@ -297,7 +297,7 @@ message Commit {
   }
     string commitMessage = 1;
     string author = 2;
-    int64  datetime = 3;
+    Time stamp = 3;
     repeated string parentCommitIds = 4;
     repeated OperationDescription ops = 5; // Also tracks renames via "update metadata" operator. Thus the history of a map can be restored, although the name changed.
 //    repeated ObjectVersion maps = 4;
