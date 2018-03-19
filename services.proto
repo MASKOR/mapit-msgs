@@ -28,21 +28,21 @@ message Region {
 }
 **/
 
-message RequestCheckout {
+message RequestWorkspace {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 20;
     MSG_TYPE = 01;
   }
 
-  string checkout = 1; // Checkout name
-  repeated string commit = 2; // commit id to create a new checkout from (if it does not exist). Multiple for merge.
-  // createIfNotExists: false: only check if this checkout exists.
-  //                    true: create the checkout, if it did not exist. Returns the existing checkout otherwise
+  string workspace = 1; // Workspace name
+  repeated string commit = 2; // commit id to create a new workspace from (if it does not exist). Multiple for merge.
+  // createIfNotExists: false: only check if this workspace exists.
+  //                    true: create the workspace, if it did not exist. Returns the existing workspace otherwise
   bool   createIfNotExists = 3;
 }
 
-message ReplyCheckout {
+message ReplyWorkspace {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 21;
@@ -55,10 +55,10 @@ message ReplyCheckout {
     ERROR = 2;
   }
   Status status = 1;
-  repeated string commit = 2; // commit ids the current checkout is based on
+  repeated string commit = 2; // commit ids the current workspace is based on
 }
 
-message RequestListCheckouts {
+message RequestListWorkspaces {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 20;
@@ -66,14 +66,14 @@ message RequestListCheckouts {
   }
 }
 
-message ReplyListCheckouts {
+message ReplyListWorkspaces {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 21;
     MSG_TYPE = 02;
   }
 
-  repeated string checkouts = 1;
+  repeated string workspaces = 1;
 }
 
 message RequestHierarchyPlain {
@@ -83,7 +83,7 @@ message RequestHierarchyPlain {
     MSG_TYPE = 993;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string entrypoint = 2;
 }
 
@@ -96,7 +96,7 @@ message ReplyHierarchyPlain {
 
   enum Status {
     SUCCESS = 0;
-    CHECKOUT_NOT_FOUND = 1;
+    WORKSPACE_NOT_FOUND = 1;
     NOT_FOUND = 404;
   }
   Status status = 1;
@@ -111,7 +111,7 @@ message RequestHierarchy {
     MSG_TYPE = 03;
   }
 
-  string checkout = 1;
+  string workspace = 1;
 //  string hierarchy = 2;
 }
 
@@ -141,7 +141,7 @@ message RequestEntitydata {
     MSG_TYPE = 04;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string entitypath = 2;
   // transmit large datasets piecewise
   uint64 offset = 3;
@@ -175,7 +175,7 @@ message RequestOperatorExecution {
     MSG_TYPE = 101;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   OperationDescription param = 2;
 }
 
@@ -203,7 +203,7 @@ message RequestStoreEntity {
     MSG_TYPE = 102;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string path = 2;
   string type = 3;
 
@@ -235,7 +235,7 @@ message RequestDeleteEntity {
     MSG_TYPE = 103;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string path = 2;
 }
 
@@ -261,7 +261,7 @@ message RequestDeleteTree {
     MSG_TYPE = 105;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string path = 2;
 }
 

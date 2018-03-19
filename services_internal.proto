@@ -12,7 +12,7 @@ message RequestGenericEntry {
     MSG_TYPE = 01;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string path = 2;
 }
 
@@ -41,7 +41,7 @@ message RequestStoreTree {
     MSG_TYPE = 101;
   }
 
-  string checkout = 1;
+  string workspace = 1;
   string path = 2;
 }
 
@@ -56,7 +56,7 @@ message ReplyStoreTree {
   enum Status {
     SUCCESS = 0;
     EXISTED = 1;
-    CHECKOUT_NOT_FOUND = 2;
+    WORKSPACE_NOT_FOUND = 2;
     ERROR = 3;
   }
 
@@ -97,7 +97,7 @@ message ReplySendLocalServerUrl {
 //    MSG_TYPE = 02;
 //  }
 
-//  string checkout = 1;
+//  string workspace = 1;
 //  string path = 2;
 //}
 
@@ -124,7 +124,7 @@ message ReplySendLocalServerUrl {
 //    MSG_TYPE = 03;
 //  }
 
-//  string checkout = 1;
+//  string workspace = 1;
 //  string path = 2;
 //}
 

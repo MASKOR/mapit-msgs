@@ -13,7 +13,7 @@ package mapit.msgs;
  * Versioning will be implemented in two steps:
  * 1) Every object has a name (unique in the tree) and id (globaly uniqe, two ids reference the same object).
  *    Objects can be read and can be written to.
- * 2) Objects can be read in the context of a commit OR a rolling commit (aka checkout).
+ * 2) Objects can be read in the context of a commit OR a rolling commit (aka workspace).
  *    When writing in the context of this commit, changes are indexed/appended to a protocol.
  */
 message Tree {
@@ -29,7 +29,7 @@ message Tree {
 //// this builds up the tree structure. Tree has a list of references.
 //// id or path: only exactly one of them must be set. id xor path.
 //// id is the hash of an object after it was commited
-//// path is [/]<checkoutname>/[<tree>/.../<entity>]
+//// path is [/]<workspaceName>/[<tree>/.../<entity>]
 message ObjectReference {
   enum CompType {
     PROTO_3  = 0;
@@ -57,7 +57,7 @@ enum MessageType
     MessageTree = 0;
     MessageEntity = 1;
     MessageCommit = 2;
-    MessageCheckout = 3;
+    MessageWorkspace = 3;
     MessageBranch = 4;
     MessageEntitydata = 5;
     MessageEmpty = 6;
@@ -70,7 +70,7 @@ message GenericEntry
     Tree tree = 2;
     Entity entity = 3;
     Commit commit = 4;
-    CheckoutObj checkout = 5;
+    WorkspaceObj workspace = 5;
     Branch branch = 6;
     bytes entityData = 7; // may be zero and stream contains data afterwards this object
 }
@@ -275,14 +275,14 @@ message Branch {
     string commitId = 2;
 }
 
-message CheckoutObj {
+message WorkspaceObj {
   enum CompType {
     PROTO_3  = 0;
     COMP_ID  = 1;
     MSG_TYPE = 8;
   }
-    Commit rollingCommit = 1; // This commit is exclusive for this checkout. It's parent is the last commit that is sealed and has no paths as ids.
-    // stored references or copies. Contains all data of the checkout.
+    Commit rollingCommit = 1; // This commit is exclusive for this workspace. It's parent is the last commit that is sealed and has no paths as ids.
+    // stored references or copies. Contains all data of the workspace.
     // Advantage over git. no copy is created
     // TODO: Not needed ?
     //repeated string transientOids = 2;
