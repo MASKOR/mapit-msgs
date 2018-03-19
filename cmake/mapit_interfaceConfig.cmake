@@ -17,4 +17,4 @@ if(NOT TARGET mapit::interface AND NOT mapit::interface_BINARY_DIR)
 endif()
  
 # These are IMPORTED targets created by mapitInterfaceTargets.cmake
-#set(MAPIT_INTERFACE_LIBRARIES upns_interface)
+#set(MAPIT_INTERFACE_LIBRARIES mapit_interface)

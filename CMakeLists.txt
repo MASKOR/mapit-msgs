@@ -1,6 +1,5 @@
 project(interface)
 cmake_minimum_required(VERSION 2.8.12) # target_include_directories
-aux_source_directory(. SRC_LIST)
 
 file(GLOB ProtoFiles *.proto)
 set(GENERATED_INCLUDE_INFIX generated/include)
@@ -54,13 +53,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${GENERATED_
                                                   ${Protobuf_INCLUDE_DIRS})
 
 # make proto visible in qtcreator
-file(GLOB_RECURSE UPNS_PROTOFILES ${PROJECT_SOURCE_DIR}/*.proto)
-add_custom_target(${PROJECT_NAME}_ADDITIONAL_PROJECT_FILES ALL ${CMAKE_COMMAND} -E echo "Add proto files to project" SOURCES ${UPNS_PROTOFILES})
+file(GLOB_RECURSE MAPIT_PROTOFILES ${PROJECT_SOURCE_DIR}/*.proto)
+add_custom_target(${PROJECT_NAME}_ADDITIONAL_PROJECT_FILES ALL ${CMAKE_COMMAND} -E echo "Add proto files to project" SOURCES ${MAPIT_PROTOFILES})
 
-#file(GLOB_RECURSE UPNS_INTERFACE_PUBLIC_HEADER_FILES "${PROTOBUF_OUTPUT_DIR}/*.h")
+#file(GLOB_RECURSE MAPIT_INTERFACE_PUBLIC_HEADER_FILES "${PROTOBUF_OUTPUT_DIR}/*.h")
 
 #install(TARGETS ${PROJECT_NAME} DESTINATION lib/${CMAKE_LIBRARY_ARCHITECTURE})
-#install(FILES ${UPNS_INTERFACE_PUBLIC_HEADER_FILES} DESTINATION include/${CMAKE_LIBRARY_ARCHITECTURE}/${MAPIT_INSTALL_INCLUDE}/msgs)
+#install(FILES ${MAPIT_INTERFACE_PUBLIC_HEADER_FILES} DESTINATION include/${CMAKE_LIBRARY_ARCHITECTURE}/${MAPIT_INSTALL_INCLUDE}/msgs)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME mapit_${PROJECT_NAME})
 
 include(GenerateExportHeader)
 
@@ -73,7 +74,7 @@ set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
   COMPATIBLE_INTERFACE_STRING MAPIT_MAJOR_VERSION
 )
 
-install(TARGETS ${PROJECT_NAME} EXPORT upns_interface_targets
+install(TARGETS ${PROJECT_NAME} EXPORT mapit_interface_targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
@@ -88,7 +89,7 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion
 )
 
-export(EXPORT upns_interface_targets
+export(EXPORT mapit_interface_targets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/mapit_interfaceTargets.cmake"
   NAMESPACE mapit::
 )
@@ -99,7 +100,7 @@ configure_file(cmake/mapit_interfaceConfig.cmake
 )
 
 set(ConfigPackageLocation lib/cmake/mapit)
-install(EXPORT upns_interface_targets
+install(EXPORT mapit_interface_targets
   FILE
     mapit_interfaceTargets.cmake
   NAMESPACE
