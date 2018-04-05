@@ -33,36 +33,6 @@ message ReplyGenericEntry {
   GenericEntry entry = 2;
 }
 
-//TODO: should be public
-message RequestStoreTree {
-  enum CompType {
-    PROTO_3  = 0;
-    COMP_ID  = 30;
-    MSG_TYPE = 101;
-  }
-
-  string workspace = 1;
-  string path = 2;
-}
-
-//TODO: should be public
-message ReplyStoreTree {
-  enum CompType {
-    PROTO_3  = 0;
-    COMP_ID  = 31;
-    MSG_TYPE = 101;
-  }
-
-  enum Status {
-    SUCCESS = 0;
-    EXISTED = 1;
-    WORKSPACE_NOT_FOUND = 2;
-    ERROR = 3;
-  }
-
-  Status status = 1;
-}
-
 // Sends a url to the server for requests of data it does not have locally.
 // E.g. Remote should compute voxelgrid_filter of /test/test/bunny which it does not have. It then would request this url.
 message RequestSendLocalServerUrl {
