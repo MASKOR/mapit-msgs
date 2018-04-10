@@ -345,6 +345,7 @@ message OperatorDescription {
   }
     string operatorName = 1;
     int32 operatorVersion = 2;
+    bool restorable = 3;
 }
 
 message OperationDescription {
