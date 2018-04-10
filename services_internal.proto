@@ -60,56 +60,25 @@ message ReplySendLocalServerUrl {
   Status status = 1;
 }
 
-//message RequestEntity {
-//  enum CompType {
-//    PROTO_3  = 0;
-//    COMP_ID  = 30;
-//    MSG_TYPE = 02;
-//  }
+message RequestStoreOperatorExecution {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 30;
+    MSG_TYPE = 101;
+  }
 
-//  string workspace = 1;
-//  string path = 2;
-//}
+  string workspace = 1;
+  OperationDescription param = 2;
+}
 
-//message ReplyEntity {
-//  enum CompType {
-//    PROTO_3  = 0;
-//    COMP_ID  = 31;
-//    MSG_TYPE = 02;
-//  }
+message ReplyStoreOperatorExecution {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 31; 
+    MSG_TYPE = 101;
+  }
 
-//  enum Status {
-//    SUCCESS = 0;
-//    NOT_FOUND = 404;
-//  }
+  int32 status_code = 1; // operator specific error code (0 is ok)
+  string error_msg = 2;  // human readable error code (optional)
+}
 
-//  Status status = 1;
-//  Entity entity = 2;
-//}
-
-//message RequestTree {
-//  enum CompType {
-//    PROTO_3  = 0;
-//    COMP_ID  = 30;
-//    MSG_TYPE = 03;
-//  }
-
-//  string workspace = 1;
-//  string path = 2;
-//}
-
-//message ReplyTree {
-//  enum CompType {
-//    PROTO_3  = 0;
-//    COMP_ID  = 31;
-//    MSG_TYPE = 03;
-//  }
-
-//  enum Status {
-//    SUCCESS = 0;
-//    NOT_FOUND = 404;
-//  }
-
-//  Status status = 1;
-//  Tree tree = 2;
-//}
