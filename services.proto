@@ -279,3 +279,29 @@ message ReplyDeleteTree {
 
   Status status = 1;
 }
+
+message RequestDoCommit {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 106;
+  }
+
+  string workspace = 1;
+  string message = 2;
+  string author = 3;
+  string email = 4;
+  Time stamp = 5;
+}
+
+message ReplyDoCommit {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 106;
+  }
+
+  int32 status_code = 1; // 0 is ok
+  string error_msg = 2; // human readable error code (optional)
+  string commit_id = 3;
+}
