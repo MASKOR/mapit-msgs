@@ -305,3 +305,31 @@ message ReplyDoCommit {
   string error_msg = 2; // human readable error code (optional)
   string commit_id = 3;
 }
+
+message RequestCommit {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 20;
+    MSG_TYPE = 107;
+  }
+
+  string commit_id = 3;
+}
+
+message ReplyCommit {
+  enum CompType {
+    PROTO_3  = 0;
+    COMP_ID  = 21;
+    MSG_TYPE = 107;
+  }
+
+  enum Status {
+    SUCCESS = 0;
+    ERROR = 1;
+  }
+
+  Status status = 1;
+  string error_msg = 2; // human readable error code (optional)
+  Commit commit = 3;
+}
+
