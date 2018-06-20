@@ -189,19 +189,8 @@ message TransformPath {
 }
 
 message Pose {
-    enum CompType {
-      PROTO_3  = 0;
-      COMP_ID  = 1;
-      MSG_TYPE = 52;
-    }
-    float x = 1;
-    float y = 2;
-    float z = 3;
-    float dir_x = 4;
-    float dir_y = 5;
-    float dir_z = 6;
-    int64 timestamp = 7; // 32bit seconds and 32bit nanoseconds
-    repeated string data = 8; // user data, additional
+  Vector     translation = 1;
+  Quaternion rotation    = 2;
 }
 
 message PosePath {
