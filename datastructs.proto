@@ -389,3 +389,41 @@ message Pointcloud2 {
     bytes data = 8;
     bool is_dense = 9;
 }
+
+/**
+* 2D map data as occupancy grid
+*/
+message Grid2D {
+    enum CompType {
+        PROTO_3  = 0;
+        COMP_ID  = 1;
+        MSG_TYPE = 15;
+    }
+    float resolution = 1;
+    uint32 width = 2;
+    uint32 height = 3;
+    // TODO rename
+    // Position of origin
+    Transform origin = 4;
+    bytes data = 5;
+}
+
+/**
+* 2D LaserSca data
+*/
+message LaserScan2D {
+    enum CompType {
+        PROTO_3  = 0;
+        COMP_ID  = 1;
+        MSG_TYPE = 16;
+    }
+    float angle_min = 1;
+    float angle_max = 2;
+    float angle_increment = 3;
+    float time_increment = 4;
+    float scan_time = 5;
+    float range_min = 6;
+    float range_max = 7;
+    repeated float ranges = 8;
+    repeated float intensities = 9;
+}
