@@ -404,7 +404,7 @@ message Grid2D {
     uint32 height = 3;
     // TODO rename
     // Position of origin
-    Transform origin = 4;
+    Pose origin = 4;
     bytes data = 5;
 }
 
